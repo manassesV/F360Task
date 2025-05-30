@@ -57,14 +57,11 @@ public class RabbitAsyncConsumer : IRabbitAsyncConsumer
             _logger.LogInformation("RabbitMQ: Message delivered. ConsumerTag: {ConsumerTag}, DeliveryTag: {DeliveryTag}, Redelivered: {Redelivered}, Exchange: {Exchange}, RoutingKey: {RoutingKey}",
            consumerTag, deliveryTag, redelivered, exchange, routingKey);
 
-            var messageId = properties.MessageId;
+            var messageId = properties.MessageId ?? $"{consumerTag}-{deliveryTag}";
 
-            if (messageId is null)
-                _logger.LogInformation("MessageId is goin null");
+            var alreadyExists = await _inboxMessageRepository.ExistAsync(messageId, cancellationToken);
 
-            var alredyExist = await _inboxMessageRepository.ExistAsync(messageId, cancellationToken);
-
-            if (alredyExist)
+            if (alreadyExists)
             {
                 _logger.LogInformation("RabbitMQ: Skipping already processed message. MessageId: {MessageId}", messageId);
                 return;
@@ -76,20 +73,23 @@ public class RabbitAsyncConsumer : IRabbitAsyncConsumer
             var messageText = Encoding.UTF8.GetString(body.Span);
             var inboxMessage = new InboxMessage(messageId, messageText);
 
-            await _transactionHandler.ExecuteAsync((clienthandler) =>
+            await _transactionHandler.ExecuteAsync(async (clienthandler) =>
             {
-                _inboxMessageRepository.AddAsync(inboxMessage);
+                await _inboxMessageRepository.AddAsync(inboxMessage);
 
-                Channel.BasicAckAsync(deliveryTag, true, cancellationToken);
+                await Channel.BasicAckAsync(deliveryTag, multiple: false, cancellationToken);
 
-                return Task.CompletedTask;
             });
 
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "RabbitMQ: Error while processing message {MessageId}", properties.MessageId);
 
-            _logger.LogError("", ex.Message);
+            if (Channel.IsOpen)
+            {
+                await Channel.BasicNackAsync(deliveryTag, multiple: false, true, cancellationToken);
+            }
         }
     }
 
