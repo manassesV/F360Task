@@ -1,16 +1,25 @@
 ﻿namespace F360Task.EventBusRabbitMQ;
 
-public static class RabbitMQResiliency
+public class RabbitMQResiliency
 {
-    public static RetryPolicy RetryPolicy =>
-      Policy
-          .Handle<Exception>()
-          .WaitAndRetry(
-              retryCount: 5,
-              sleepDurationProvider: attempt => TimeSpan.FromSeconds(2),
-              onRetry: (exception, timeSpan, retryCount, context) =>
-              {
-                  // Logging can go here (keep it minimal)
-                  // e.g., Console.WriteLine($"Retry {retryCount} after {timeSpan} due to {exception.Message}");
-              });
+    private ILogger<RabbitMQResiliency> _logger;
+
+    public RabbitMQResiliency(ILogger<RabbitMQResiliency> logger)
+    {
+        _logger = logger;
+    }
+
+
+    public AsyncRetryPolicy GetRetryPolicy()
+    {
+        return Policy
+            .Handle<Exception>()
+            .Or<BrokerUnreachableException>()
+            .WaitAndRetryForeverAsync(
+                sleepDurationProvider: _ => TimeSpan.FromSeconds(5),
+                onRetry: (exception, timespan) =>
+                {
+                    _logger.LogWarning($"Retrying in {timespan.TotalSeconds}s due to: {exception.Message}");
+                });
+    }
 }

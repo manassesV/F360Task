@@ -20,9 +20,9 @@ public class RabbitMqPublisher : IRabbitMqPublisher
     {
 
 
-        using var connection = _rabbitMQConnectionProvider.GetConnection();
+        var connection = _rabbitMQConnectionProvider.GetConnection();
 
-        using var channel = await connection.CreateChannelAsync();
+        var channel = await connection.CreateChannelAsync();
 
         try
         {

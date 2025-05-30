@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\F360Task.EventBus\F360Task.EventBus.csproj" />
+    <ProjectReference Include="..\F360Task.Infrastructure\F360Task.Infrastructure.csproj" />
     <ProjectReference Include="..\F360Task.SharedKernel\F360Task.SharedKernel.csproj" />
   </ItemGroup>
 

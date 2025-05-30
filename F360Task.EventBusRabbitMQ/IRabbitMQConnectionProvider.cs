@@ -5,6 +5,6 @@ namespace F360Task.EventBusRabbitMQ
     {
         Task CloseAsync();
         IConnection GetConnection();
-        Task InitializeAsync();
+        Task InitializeAsync(CancellationToken cancellationToken);
     }
 }

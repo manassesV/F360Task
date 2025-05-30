@@ -5,13 +5,16 @@ public class RabbitMQConsumerHostedService : IHostedService
 
     private readonly IRabbitMqConsumer _rabbitMqConsumer;
     private readonly ILogger<RabbitMQConsumerHostedService> _logger;
+    private readonly IRetryResiliency _retryResiliency;
 
 
     public RabbitMQConsumerHostedService(IRabbitMqConsumer rabbitMqConsumer,
-        ILogger<RabbitMQConsumerHostedService> logger)
+        ILogger<RabbitMQConsumerHostedService> logger,
+        IRetryResiliency retryResiliency)
     {
         _rabbitMqConsumer = rabbitMqConsumer ?? throw new ArgumentException(nameof(rabbitMqConsumer));
         _logger =logger ?? throw new ArgumentException(nameof(logger));
+        _retryResiliency = retryResiliency;
     }
 
 
@@ -19,10 +22,24 @@ public class RabbitMQConsumerHostedService : IHostedService
     {
         _logger.LogInformation("Starting RabbitMQ consumer...");
 
-        await _rabbitMqConsumer.Consumer(
-               queueName: "task_queue",
-               consumerTag: "f360_exchange",
-               cancellationToken);
+        try
+        {
+            await _retryResiliency.ExecuteAsync(async () =>
+            {
+                await _rabbitMqConsumer.Consumer(
+                    queueName: "l360",
+                    consumerTag: "f360_exchange",
+                    cancellationToken);
+            }, cancellationToken);
+
+            _logger.LogInformation("RabbitMQ consumer started successfully.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "RabbitMQ consumer failed to start after retries.");
+            throw; 
+        }
+
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)

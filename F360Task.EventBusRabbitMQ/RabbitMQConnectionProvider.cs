@@ -16,7 +16,7 @@ public class RabbitMQConnectionProvider : IRabbitMQConnectionProvider
         _retry = retry ?? throw new ArgumentNullException(nameof(retry)); ;
     }
 
-    public async Task InitializeAsync()
+    public async Task InitializeAsync(CancellationToken cancellationToken)
     {
         if (_initialized) return;
 
@@ -26,17 +26,22 @@ public class RabbitMQConnectionProvider : IRabbitMQConnectionProvider
         {
             if (_initialized) return;
 
-            Func<Task<IConnection>> factory = () => _factory.CreateConnectionAsync();
-            _connection = await _retry.ExecuteAsync<IConnection>(factory);
+            Func<Task<IConnection>> factory = () =>
+                Task.Run(() => _factory.CreateConnectionAsync());
+
+            _connection = await _retry.ExecuteAsync(factory, cancellationToken);
 
             _initialized = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[RabbitMQ Init Error] {ex.Message}");
+            throw; // Important: let it propagate so the app can restart or retry startup
         }
         finally
         {
             _initLock.Release();
         }
-
-
     }
 
     public async Task CloseAsync()

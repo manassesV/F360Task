@@ -21,9 +21,9 @@ public class RabbitMqConsumer : IRabbitMqConsumer
     {
 
 
-        using var connection = _rabbitMQConnectionProvider.GetConnection();
+        var connection = _rabbitMQConnectionProvider.GetConnection();
 
-        using var channel = await connection.CreateChannelAsync();
+        var channel = await connection.CreateChannelAsync();
 
         try
         {
@@ -40,9 +40,10 @@ public class RabbitMqConsumer : IRabbitMqConsumer
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to publish message. Rolling back.");
+            _logger.LogError(ex, "Failed to consume message. Rolling back.");
 
             throw;
+
         }
 
     }

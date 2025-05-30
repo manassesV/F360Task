@@ -1,0 +1,14 @@
+﻿global using F360Task.Domain.Seed;
+global using MongoFramework;
+global using F360Task.Domain.Entities.Email;
+global using F360Task.Domain.Entities.Report;
+global using Amazon.Runtime.Internal.Transform;
+global using F360Task.Domain.AggregatesModel;
+global using MongoFramework.Linq;
+global using F360Task.Infrastructure.Exceptions;
+global using Microsoft.Extensions.Logging;
+global using MongoDB.Driver;
+global using F360Task.Infrastructure.Infrastructure.Contexts.Idempotent;
+global using F360Task.Infrastructure.Infrastructure.Inbox;
+global using F360Task.Infrastructure.Outbox;
+global using F360Task.Infrastructure.Infrastructure.Outbox;

@@ -22,8 +22,8 @@ namespace F360Task.EventBusRabbitMQ.Publisher
             while (!cancellationToken.IsCancellationRequested)
             {
                await  _rabbitMqPublisher.Publish(
-                    "",
-                    "",
+                    "l360",
+                    "l360",
                     true,
                     null,
                     cancellationToken);

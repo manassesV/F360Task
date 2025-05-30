@@ -22,7 +22,7 @@ public class RabbitMQInitializerHostedService : IHostedService
 
         _logger.LogInformation("Starting RabbitMQ connection initialization...");
 
-        await _provider.InitializeAsync();
+        await _provider.InitializeAsync(cancellationToken);
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)

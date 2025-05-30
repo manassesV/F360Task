@@ -1,4 +1,9 @@
-﻿namespace F360Task.EventBusRabbitMQ.Extensions;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Polly.Retry;
+using RabbitMQ.Client.Exceptions;
+using System.Net.Sockets;
+
+namespace F360Task.EventBusRabbitMQ.Extensions;
 
 public static class RabbitMqDependencyInjectionExtensions
 {
@@ -40,27 +45,32 @@ public static class RabbitMqDependencyInjectionExtensions
         services.AddSingleton<IConnectionFactory>(sp => new ConnectionFactory
         {
             HostName = rabbitConfig.HostName,
+            Port = rabbitConfig.Port,          // Usually 5671 for TLS
             UserName = rabbitConfig.UserName,
-            Password = rabbitConfig.Password
+            Password = rabbitConfig.Password,
+            VirtualHost = rabbitConfig.VirtualHost,
+            Ssl = new SslOption
+            {
+                Enabled = rabbitConfig.UseSsl,
+                ServerName = rabbitConfig.HostName, // Required for proper TLS handshake
+                Version = System.Security.Authentication.SslProtocols.Tls12
+            }
         });
 
-        services.AddSingleton<RetryPolicy>(RabbitMQResiliency.RetryPolicy);
+        services.AddSingleton<RabbitMQResiliency>();
+        services.AddSingleton<AsyncRetryPolicy>(sp =>
+        {
+            var resiliency = sp.GetRequiredService<RabbitMQResiliency>();
+            return resiliency.GetRetryPolicy();
+        });
         services.AddTransient<IRetryResiliency, RetryResiliency>();
-        services.AddScoped<IRabbitMQConnectionProvider, RabbitMQConnectionProvider>();
+        services.AddSingleton<IRabbitMQConnectionProvider, RabbitMQConnectionProvider>();
 
         services.AddHostedService<RabbitMQInitializerHostedService>();
 
-        services.AddScoped<IRabbitAsyncConsumer, RabbitAsyncConsumer>();
-        services.AddScoped<IRabbitMqConsumer, RabbitMqConsumer>();
-        services.AddHostedService<RabbitMQConsumerHostedService>();
-
-
-
-        services.AddScoped<IRabbitMqPublisher, RabbitMqPublisher>();
-        services.AddHostedService<RabbitMQPublisherHostedService>();
-
         services.AddRabbitMQConsumer();
-        services.AddRabbitMQPublisher();
+
+        //services.AddRabbitMQPublisher();
 
         return builder;
     }
@@ -68,7 +78,7 @@ public static class RabbitMqDependencyInjectionExtensions
 
     public static IServiceCollection AddRabbitMQPublisher(this IServiceCollection services)
     {
-        services.AddScoped<IRabbitMqPublisher, RabbitMqPublisher>();
+        services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
         services.AddHostedService<RabbitMQPublisherHostedService>();
 
         return services;
@@ -76,8 +86,8 @@ public static class RabbitMqDependencyInjectionExtensions
 
     public static IServiceCollection AddRabbitMQConsumer(this IServiceCollection services)
     {
-        services.AddScoped<IRabbitAsyncConsumer, RabbitAsyncConsumer>();
-        services.AddScoped<IRabbitMqConsumer, RabbitMqConsumer>();
+        services.AddSingleton<IRabbitAsyncConsumer, RabbitAsyncConsumer>();
+        services.AddSingleton<IRabbitMqConsumer, RabbitMqConsumer>();
         services.AddHostedService<RabbitMQConsumerHostedService>();
 
         return services;

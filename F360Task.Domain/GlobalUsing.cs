@@ -1,0 +1,10 @@
+﻿global using MediatR;
+global using F360Task.Domain.Events;
+global using F360Task.Domain.Seed;
+global using F360Task.Domain.Entities.Report;
+global using F360Task.Domain.Entities.Email;
+global using F360Task.Domain.Seed;
+global using F360Task.Domain.Entities.Email;
+global using F360Task.Domain.Entities.Report;
+global using F360Task.Domain.Entities.Email;
+global using F360Task.Domain.Entities.Report;
