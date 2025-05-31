@@ -36,6 +36,10 @@ public class RabbitMQPublisherHostedService : BackgroundService
                     var transactionHandler = scope.ServiceProvider
                         .GetRequiredService<ITransactionHandler<IClientSessionHandle>>();
 
+                    var outBox = new OutboxMessage("Email", "Email");
+                    await repository.AddAsync(outBox);
+                    await repository.UnitOfWork.SaveChangesAsync(stoppingToken);
+
                     await ProcessMessagesAsync(repository, publisher, transactionHandler, stoppingToken);
                     retryCount = 0; ;
                 }
