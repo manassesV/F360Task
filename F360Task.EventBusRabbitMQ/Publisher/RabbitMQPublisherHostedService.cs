@@ -1,116 +1,157 @@
-﻿using Amazon.Runtime;
-using F360Task.Infrastructure.Outbox;
-using RabbitMQ.Client;
+﻿namespace F360Task.EventBusRabbitMQ.Publisher;
 
-namespace F360Task.EventBusRabbitMQ.Publisher
+public class RabbitMQPublisherHostedService : BackgroundService
 {
-    public class RabbitMQPublisherHostedService : IHostedService
+    private readonly ILogger<RabbitMQPublisherHostedService> _logger;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly TimeSpan _pollingInterval = TimeSpan.FromSeconds(30);
+    private const int MaxRetryCount = 3;
+
+    public RabbitMQPublisherHostedService(
+        IServiceProvider serviceProvider,
+        ILogger<RabbitMQPublisherHostedService> logger)
     {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+    }
 
-        private readonly IRabbitMqPublisher _rabbitMqPublisher;
-        private readonly ILogger<RabbitMQPublisherHostedService> _logger;
-        private readonly IOutboxMessageRepository _outboxMessageRepository;
-        private readonly ITransactionHandler<IClientSessionHandle> _transactionHandler;
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        _logger.LogInformation("Outbox Processor Service starting");
 
-        public RabbitMQPublisherHostedService(IRabbitMqPublisher rabbitMqPublisher,
-            ILogger<RabbitMQPublisherHostedService> logger,
-            IOutboxMessageRepository outboxMessageRepository,
-            ITransactionHandler<IClientSessionHandle> transactionHandler)
+        using var timer = new PeriodicTimer(_pollingInterval);
+        var retryCount = 0;
+
+        while (!stoppingToken.IsCancellationRequested &&
+               await timer.WaitForNextTickAsync(stoppingToken))
         {
-            _rabbitMqPublisher = rabbitMqPublisher ?? throw new ArgumentException(nameof(rabbitMqPublisher));
-            _logger = logger ?? throw new ArgumentException(nameof(logger));
-            _outboxMessageRepository = outboxMessageRepository ?? throw new ArgumentException(nameof(outboxMessageRepository));
-            _transactionHandler = transactionHandler;
+            try
+            {
+                await using (var scope = _serviceProvider.CreateAsyncScope())
+                {
+                    var repository = scope.ServiceProvider
+                        .GetRequiredService<IOutboxMessageRepository>();
+                    var publisher = scope.ServiceProvider
+                        .GetRequiredService<IRabbitMqPublisher>();
+                    var transactionHandler = scope.ServiceProvider
+                        .GetRequiredService<ITransactionHandler<IClientSessionHandle>>();
+
+                    await ProcessMessagesAsync(repository, publisher, transactionHandler, stoppingToken);
+                    retryCount = 0; ;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogInformation("Outbox processing was cancelled");
+                break;
+            }
+            catch (Exception ex) when (retryCount++ < MaxRetryCount)
+            {
+                _logger.LogError(ex, "Error processing outbox messages (Retry {RetryCount}/{MaxRetries})",
+                    retryCount, MaxRetryCount);
+                await Task.Delay(5000, stoppingToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex, "Max retries reached for outbox processing");
+                throw;
+            }
         }
 
+        _logger.LogInformation("Outbox Processor Service stopped");
+    }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+    private async Task ProcessMessagesAsync(
+        IOutboxMessageRepository repository,
+        IRabbitMqPublisher publisher,
+        ITransactionHandler<IClientSessionHandle> transactionHandler,
+        CancellationToken cancellationToken)
+    {
+        var messages = await repository.FindAllAsync(false, cancellationToken);
+
+        if (messages.Count == 0)
         {
-            const int pollingIntervalMs = 300000;
-            var failledAttemps = 0;
-            const int maxFailedAttempts = 5;
+            _logger.LogDebug("No pending messages found");
+            return;
+        }
 
+        _logger.LogInformation("Processing {MessageCount} messages", messages.Count);
 
+        await Parallel.ForEachAsync(messages, new ParallelOptions
+        {
+            CancellationToken = cancellationToken,
+            MaxDegreeOfParallelism = Environment.ProcessorCount
+        }, async (message, ct) =>
+        {
+            using var _ = _logger.BeginScope("Processing message {MessageId}", message.Id);
+            await ProcessSingleMessageAsync(message, repository, publisher, transactionHandler, ct);
+        });
+    }
 
-            while (!cancellationToken.IsCancellationRequested)
+    private async Task ProcessSingleMessageAsync(
+        OutboxMessage message,
+        IOutboxMessageRepository repository,
+        IRabbitMqPublisher publisher,
+        ITransactionHandler<IClientSessionHandle> transactionHandler,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (message.Payload is null)
             {
-                try
-                {
-
-                    await Task.Delay(pollingIntervalMs, cancellationToken);
-
-
-                    var outboxMessages =
-                        await _outboxMessageRepository
-                        .FindAllAsync(false, cancellationToken);
-
-                    if (outboxMessages.Count == 0)
-                    {
-                        failledAttemps = 0;
-                        continue;
-                    }
-
-                    var options = new ParallelOptions
-                    {
-                        CancellationToken = cancellationToken,
-                        MaxDegreeOfParallelism = Environment.ProcessorCount
-                    };
-
-                    await Parallel.ForEachAsync(outboxMessages, options, async (message, ct) =>
-                    {
-                        try
-                        {
-                            if (message.Payload is null)
-                            {
-                                _logger.LogWarning("Skipping null message or payload");
-
-                                return;
-                            }
-
-                            byte[] temp = Encoding.UTF8.GetBytes(message.Payload);
-
-                            await _rabbitMqPublisher.Publish(
-                              "l360",
-                              "l360",
-                              true,
-                              message.Id.ToString(),
-                              temp,
-                              cancellationToken);
-
-                            await _transactionHandler.ExecuteAsync(() =>
-                            {
-                                message.ChangeToProcessed();
-                                _outboxMessageRepository.u
-                            });
-                        }
-                        catch (Exception)
-                        {
-
-                            throw;
-                        }
-                     
-
-                    });
-                    
-                }
-                catch (Exception)
-                {
-                   
-                }
-             
+                _logger.LogWarning("Message has null payload");
+                await MarkMessageAsProcessed(message, repository, transactionHandler, false);
+                return;
             }
 
-        }
+            var payload = Encoding.UTF8.GetBytes(message.Payload);
 
-        public Task StopAsync(CancellationToken cancellationToken)
+            await transactionHandler.ExecuteAsync(async session =>
+            {
+                await publisher.Publish(
+                    exchange: "l360",
+                    routingKey: "l360",
+                    mandatory: true,
+                    MessageId: message.Id.ToString(),
+                    body: payload,
+                    cancellationToken: cancellationToken);
+
+                await MarkMessageAsProcessed(message, repository, transactionHandler, true);
+            }, cancellationToken);
+        }
+        catch (Exception ex)
         {
-            throw new NotImplementedException();
+            _logger.LogError(ex, "Failed to process message");
+            await MarkMessageAsProcessed(message, repository, transactionHandler, false);
         }
     }
-}
 
-public static class Project
-{
-    public static ReadOnlyMemory<byte> AsReadOnlyMemory(this byte[] bytes)
-    => bytes.AsMemory();
+    private async Task MarkMessageAsProcessed(
+        OutboxMessage message,
+        IOutboxMessageRepository repository,
+        ITransactionHandler<IClientSessionHandle> transactionHandler,
+        bool isSuccess)
+    {
+        try
+        {
+            await transactionHandler.ExecuteAsync(async session =>
+            {
+                if (isSuccess)
+                {
+                    message.ChangeToProcessed();
+                }
+                else
+                {
+                    message.ChangeToFailed();
+                    message.IncrementRetryCount();
+                }
+
+                await repository.UpdateAsync(message);
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to update message status");
+        }
+    }
 }

@@ -35,4 +35,8 @@ public class OutboxMessageRepository : IOutboxMessageRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task UpdateAsync(OutboxMessage outboxMessage)
+    {
+        _context.OutboxMessage.Update(outboxMessage);
+    }
 }
