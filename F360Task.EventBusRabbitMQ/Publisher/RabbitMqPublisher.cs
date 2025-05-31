@@ -11,8 +11,39 @@ public class RabbitMqPublisher : IRabbitMqPublisher
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    private async Task EnsureQueueBoundAsync (
+        string exchange,
+        string queueName,
+        string routingKey,
+        IChannel channel,
+        string exchangeType = ExchangeType.Direct,
+        bool durable = true,
+        CancellationToken cancellationToken = default)
+    {
+       await  channel.ExchangeDeclareAsync(
+            exchange: exchange,
+            type: exchangeType,
+            durable: durable);
+
+       await channel.QueueDeclareAsync(
+            queue: queueName,
+            durable: true,
+            exclusive: false,
+            autoDelete: false,
+            arguments: null);
+
+       await channel.QueueBindAsync(
+            queue: queueName,
+            exchange: exchange,
+            routingKey: routingKey,
+            arguments: null);
+
+
+    }
+
     public async Task Publish(
         string exchange,
+        string queueName,
         string routingKey,
         bool mandatory,
         string MessageId,
@@ -24,6 +55,9 @@ public class RabbitMqPublisher : IRabbitMqPublisher
         var connection = _rabbitMQConnectionProvider.GetConnection();
 
         var channel = await connection.CreateChannelAsync();
+
+        await EnsureQueueBoundAsync(exchange, queueName, routingKey, channel, cancellationToken: cancellationToken);
+    
 
         try
         {

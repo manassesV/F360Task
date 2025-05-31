@@ -2,18 +2,20 @@
 
 public class OutboxMessage
 {
-    public OutboxMessage(string type, string payload)
+    public OutboxMessage(string exchange, string queue, string payload)
     {
         Id = Guid.NewGuid();
         CreatedAt = DateTime.Now;
-        Type = type;
+        Exchange = exchange;
         Payload = payload;
         Processed = false;
+        Queue = queue;
     }
 
     public Guid Id { get; private set; } 
     public DateTime CreatedAt { get; private set; }
-    public string Type { get; private set; }
+    public string Exchange { get; private set; }
+    public string Queue { get; private set; }
     public string Payload { get; private set; }
     public bool Processed { get; private set; }
     public DateTime? ProcessedAt { get; private set; }
