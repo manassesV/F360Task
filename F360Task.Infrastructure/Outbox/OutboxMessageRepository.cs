@@ -1,8 +1,10 @@
-﻿namespace F360Task.Infrastructure.Outbox;
+﻿
+namespace F360Task.Infrastructure.Outbox;
 
 public class OutboxMessageRepository : IOutboxMessageRepository
 {
     private readonly ApplicationDbContext _context;
+    public IUnitOfWork UnitOfWork => _context;
 
     public OutboxMessageRepository(ApplicationDbContext context)
     {
@@ -22,4 +24,15 @@ public class OutboxMessageRepository : IOutboxMessageRepository
 
         return request != null ? Task.FromResult(true) : Task.FromResult(false);
     }
+
+    public async Task<List<OutboxMessage>> FindAllAsync(bool processed,
+        CancellationToken cancellationToken)
+    {
+        return await _context.OutboxMessage
+            .AsNoTracking()
+            .Where(p => p.Processed == processed)
+            .OrderBy(x => x.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
 }

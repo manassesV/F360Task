@@ -1,25 +1,40 @@
-﻿namespace F360Task.Infrastructure.Infrastructure.Inbox;
+﻿using SharpCompress.Common;
 
-public class OutboxMessageRepository : IInboxMessageRepository
+namespace F360Task.Infrastructure.Inbox;
+
+public class InboxMessageRepository : IInboxMessageRepository
 {
     private readonly ApplicationDbContext _context;
+    public IUnitOfWork UnitOfWork => _context;
 
-    public OutboxMessageRepository(ApplicationDbContext context)
+
+    public InboxMessageRepository(ApplicationDbContext context)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }
+
 
     public async Task AddAsync(InboxMessage inboxMessage)
     {
         _context.InboxMessage.Add(inboxMessage);
     }
 
-    public Task<bool> ExistAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<bool> ExistAsync(string id, CancellationToken cancellationToken)
     {
-        var request = _context.InboxMessage
+        var exists = await _context.InboxMessage
             .AsNoTracking()
-            .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
+            .AnyAsync(r => r.Id == id, cancellationToken);
 
-        return request != null ? Task.FromResult(true) : Task.FromResult(false);
+        return exists;
+    }
+
+    public Task<List<InboxMessage>> FindAllAsync(bool processed, CancellationToken cancellationToken)
+    {
+        return _context.InboxMessage
+            .AsNoTracking()
+            .Where(p => p.Processed)
+            .OrderBy(c => c.ProcessedAt)
+            .ToListAsync(cancellationToken);
     }
 }
+

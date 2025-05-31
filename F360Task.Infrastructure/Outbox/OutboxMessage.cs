@@ -9,4 +9,10 @@ public class OutboxMessage
     public bool Processed { get; set; }
     public DateTime? ProcessedAt { get; set; }
 
+    public void ChangeToProcessed()
+    {
+        Processed = true;
+        ProcessedAt = DateTime.Now;
+    }
+
 }

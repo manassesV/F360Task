@@ -15,6 +15,7 @@ public class RabbitMqPublisher : IRabbitMqPublisher
         string exchange,
         string routingKey,
         bool mandatory,
+        string MessageId,
         ReadOnlyMemory<byte> body,
         CancellationToken cancellationToken)
     {
@@ -30,6 +31,7 @@ public class RabbitMqPublisher : IRabbitMqPublisher
 
             var props = new BasicProperties();
             props.Persistent = true;
+            props.MessageId = MessageId;
 
 
             await channel.BasicPublishAsync(

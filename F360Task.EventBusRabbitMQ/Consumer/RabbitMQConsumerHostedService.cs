@@ -3,16 +3,16 @@
 public class RabbitMQConsumerHostedService : IHostedService
 {
 
-    private readonly IRabbitMqConsumer _rabbitMqConsumer;
     private readonly ILogger<RabbitMQConsumerHostedService> _logger;
     private readonly IRetryResiliency _retryResiliency;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
 
 
-    public RabbitMQConsumerHostedService(IRabbitMqConsumer rabbitMqConsumer,
+    public RabbitMQConsumerHostedService(IServiceScopeFactory serviceScopeFactory,
         ILogger<RabbitMQConsumerHostedService> logger,
         IRetryResiliency retryResiliency)
     {
-        _rabbitMqConsumer = rabbitMqConsumer ?? throw new ArgumentException(nameof(rabbitMqConsumer));
+        _serviceScopeFactory = serviceScopeFactory;
         _logger =logger ?? throw new ArgumentException(nameof(logger));
         _retryResiliency = retryResiliency;
     }
@@ -24,6 +24,10 @@ public class RabbitMQConsumerHostedService : IHostedService
 
         try
         {
+            using var scope = _serviceScopeFactory.CreateScope();
+
+            var _rabbitMqConsumer = scope.ServiceProvider.GetRequiredService<IRabbitMqConsumer>();
+
             await _retryResiliency.ExecuteAsync(async () =>
             {
                 await _rabbitMqConsumer.Consumer(

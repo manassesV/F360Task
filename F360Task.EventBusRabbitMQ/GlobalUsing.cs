@@ -28,4 +28,7 @@ global using F360Task.EventBusRabbitMQ.Configs;
 global using F360Task.EventBusRabbitMQ.Publisher;
 global using RabbitMQ.Client.Exceptions;
 global using System.Net.Sockets;
-global using F360Task.Infrastructure.Infrastructure.Inbox;
+global using F360Task.Infrastructure.Inbox;
+global using F360Task.Domain.Seed;
+global using MongoDB.Driver;
+global using System.Text;

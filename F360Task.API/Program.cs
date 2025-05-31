@@ -1,9 +1,11 @@
 using F360Task.EventBusRabbitMQ.Extensions;
+using F360Task.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.AddInfrastructure();
 builder.AddRabbitMqEventBus();
 
 var app = builder.Build();

@@ -3,12 +3,12 @@ public class RequestManager : IRequestManager
 {
     private readonly ILogger<RequestManager> _logger;
     private readonly ITransactionHandler<IClientSessionHandle> _transactionHandler;
-    private readonly IInboxMessageRepository _clienteRequestRepository;
+    private readonly IClienteRequestRepository _clienteRequestRepository;
 
     public RequestManager(ApplicationDbContext context,
         ILogger<RequestManager> logger,
         ITransactionHandler<IClientSessionHandle> transactionHandler,
-        IInboxMessageRepository clienteRequestRepository)
+        IClienteRequestRepository clienteRequestRepository)
     {
         _logger = logger;
         _transactionHandler = transactionHandler;

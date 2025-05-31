@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\F360Task.EventBusRabbitMQ\F360Task.EventBusRabbitMQ.csproj" />
+    <ProjectReference Include="..\F360Task.Infrastructure\F360Task.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

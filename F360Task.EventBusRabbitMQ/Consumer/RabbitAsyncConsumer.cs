@@ -1,7 +1,4 @@
-﻿using F360Task.Domain.Seed;
-using MongoDB.Driver;
-using System.Text;
-using System.Text.Unicode;
+﻿using F360Task.Infrastructure;
 
 namespace F360Task.EventBusRabbitMQ.Consumer;
 
@@ -11,21 +8,22 @@ public class RabbitAsyncConsumer : IRabbitAsyncConsumer
     private readonly ILogger<RabbitAsyncConsumer> _logger;
     private readonly IConnection _connection;
     private readonly IInboxMessageRepository _inboxMessageRepository;
-    private readonly ITransactionHandler<IClientSessionHandle> _transactionHandler;
+    private readonly IServiceScopeFactory _scopeFactory;
+
 
     public RabbitAsyncConsumer(IRabbitMQConnectionProvider rabbitMQConnectionProvider,
         ILogger<RabbitAsyncConsumer> logger,
         IInboxMessageRepository inboxMessageRepository,
-        ITransactionHandler<IClientSessionHandle> transactionHandler)
+        IServiceScopeFactory scopeFactory)
     {
         _rabbitMQConnectionProvider = rabbitMQConnectionProvider;
-        //_connection = _rabbitMQConnectionProvider.GetConnection();
+        _connection = _rabbitMQConnectionProvider.GetConnection();
         _logger = logger;
         _inboxMessageRepository = inboxMessageRepository;
-        _transactionHandler = transactionHandler;
+        _scopeFactory = scopeFactory;
     }
 
-    public IChannel? Channel => null;
+    public IChannel? Channel =>  _connection.CreateChannelAsync().Result;
 
     public async Task HandleBasicCancelAsync(string consumerTag, CancellationToken cancellationToken = default)
     {
@@ -52,6 +50,10 @@ public class RabbitAsyncConsumer : IRabbitAsyncConsumer
         ReadOnlyMemory<byte> body,
         CancellationToken cancellationToken = default)
     {
+        using var scope = _scopeFactory.CreateScope();
+        var transactionHandler = scope.ServiceProvider.GetRequiredService<ITransactionHandler<IClientSessionHandle>>();
+
+
         try
         {
             _logger.LogInformation("RabbitMQ: Message delivered. ConsumerTag: {ConsumerTag}, DeliveryTag: {DeliveryTag}, Redelivered: {Redelivered}, Exchange: {Exchange}, RoutingKey: {RoutingKey}",
@@ -73,9 +75,10 @@ public class RabbitAsyncConsumer : IRabbitAsyncConsumer
             var messageText = Encoding.UTF8.GetString(body.Span);
             var inboxMessage = new InboxMessage(messageId, messageText);
 
-            await _transactionHandler.ExecuteAsync(async (clienthandler) =>
+            await transactionHandler.ExecuteAsync(async (clienthandler) =>
             {
                 await _inboxMessageRepository.AddAsync(inboxMessage);
+                await _inboxMessageRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
 
                 await Channel.BasicAckAsync(deliveryTag, multiple: false, cancellationToken);
 

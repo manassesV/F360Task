@@ -8,7 +8,6 @@ public class ApplicationDbContext : MongoDbContext, IUnitOfWork
     public required MongoDbSet<InboxMessage> InboxMessage { get; init; }
     public required MongoDbSet<OutboxMessage> OutboxMessage { get; init; }
 
-    private readonly IMongoDbConnection _connection;
 
     public ApplicationDbContext(IMongoDbConnection connection) : base(connection)
     {

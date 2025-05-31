@@ -70,7 +70,7 @@ public static class RabbitMqDependencyInjectionExtensions
 
         services.AddRabbitMQConsumer();
 
-        //services.AddRabbitMQPublisher();
+        services.AddRabbitMQPublisher();
 
         return builder;
     }
@@ -86,8 +86,8 @@ public static class RabbitMqDependencyInjectionExtensions
 
     public static IServiceCollection AddRabbitMQConsumer(this IServiceCollection services)
     {
-        services.AddSingleton<IRabbitAsyncConsumer, RabbitAsyncConsumer>();
-        services.AddSingleton<IRabbitMqConsumer, RabbitMqConsumer>();
+        services.AddScoped<IRabbitAsyncConsumer, RabbitAsyncConsumer>();
+        services.AddScoped<IRabbitMqConsumer, RabbitMqConsumer>();
         services.AddHostedService<RabbitMQConsumerHostedService>();
 
         return services;

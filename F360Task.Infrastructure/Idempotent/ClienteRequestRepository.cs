@@ -1,6 +1,8 @@
-﻿namespace F360Task.Infrastructure.Infrastructure.Contexts.Idempotent;
+﻿using SharpCompress.Common;
 
-public class ClienteRequestRepository : IInboxMessageRepository
+namespace F360Task.Infrastructure.Infrastructure.Contexts.Idempotent;
+
+public class ClienteRequestRepository : IClienteRequestRepository
 {
     private readonly ApplicationDbContext _context;
 
@@ -14,12 +16,12 @@ public class ClienteRequestRepository : IInboxMessageRepository
         _context.ClienteRequest.Add(request);
     }
 
-    public Task<bool> ExistAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<bool> ExistAsync(Guid id, CancellationToken cancellationToken)
     {
-        var request = _context.ClienteRequest
+        var request = await _context.ClienteRequest
             .AsNoTracking()
             .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
 
-        return request != null ? Task.FromResult(true) : Task.FromResult(false);
+        return request != null;
     }
 }
