@@ -1,4 +1,6 @@
-﻿namespace F360Task.API.Controllers;
+﻿using F360Task.Application.Commands;
+
+namespace F360Task.API.Controllers;
 
 public class SchedulerEmailController
     : BaseController<CreateSchedullerEmailCommand, ISchedulerEmailQueries, Result>
@@ -12,11 +14,35 @@ public class SchedulerEmailController
 
     [HttpPost]
     public override async Task<ActionResult<Result>> Add(
+        [FromHeader(Name = "x-requestid")] string requestId,
         [FromBody] CreateSchedullerEmailCommand command,
         CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(command, cancellationToken);
-        return Ok(result);
+        if (!Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
+        {
+            _logger.LogWarning("Invalid request ID format: {RequestId}", requestId);
+            return BadRequest(Result.Fail($"Invalid request ID format: {requestId}"));
+        }
+        try
+        {
+            // Process the command
+            var identifiedCommand = new IdentifiedCommand<CreateSchedullerEmailCommand, Result>(command, guid);
+            var result = await _mediator.Send(identifiedCommand, cancellationToken);
+
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Successfully processed request {RequestId}", requestId);
+                return Ok(result);
+            }
+
+            _logger.LogWarning("Failed to process request {RequestId}: {Error}", requestId, result.Errors);
+            return BadRequest(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error processing request {RequestId}", requestId);
+            return StatusCode(500, Result.Fail("An unexpected error occurred"));
+        }
     }
 
     [HttpDelete("{id}")]

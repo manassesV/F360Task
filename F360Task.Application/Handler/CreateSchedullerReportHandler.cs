@@ -49,3 +49,21 @@ public class CreateSchedullerReportHandler : IRequestHandler<CreateSchedullerRep
         }
     }
 }
+
+
+//Use for Idempotency in command process
+public class CreateSchedullerReportCommandIdentifiedCommandHandler : IdentifiedCommandHandler<CreateSchedullerReportCommand, Result>
+{
+    public CreateSchedullerReportCommandIdentifiedCommandHandler(
+        IMediator mediator,
+        IRequestManager requestManager,
+        ILogger<IdentifiedCommandHandler<CreateSchedullerReportCommand, Result>> logger
+        ) : base(mediator, requestManager, logger)
+    {
+    }
+
+    protected override Result CreateResultForDuplicateRequest()
+    {
+        return Result.Fail("deplicated request");
+    }
+}

@@ -20,6 +20,7 @@ public abstract class BaseController<TCommand, TService, TResult> : ControllerBa
 
     [HttpPost]
     public abstract Task<ActionResult<TResult>> Add(
+        [FromHeader(Name = "x-requestid")] string requestId,
         [FromBody] TCommand command,
         CancellationToken cancellationToken);
 

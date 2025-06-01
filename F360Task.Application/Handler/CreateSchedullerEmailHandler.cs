@@ -50,3 +50,21 @@ public class CreateSchedullerEmailHandler : IRequestHandler<CreateSchedullerEmai
         }
     }
 }
+
+
+//Use for Idempotency in command process
+public class CreateSchedullerEmailIdentifiedCommandHandler : IdentifiedCommandHandler<CreateSchedullerEmailCommand, Result>
+{
+    public CreateSchedullerEmailIdentifiedCommandHandler(
+        IMediator mediator,
+        IRequestManager requestManager,
+        ILogger<IdentifiedCommandHandler<CreateSchedullerEmailCommand, Result>> logger
+        ) : base(mediator, requestManager, logger)
+    {
+    }
+
+    protected override Result CreateResultForDuplicateRequest()
+    {
+        return Result.Fail("deplicated request");
+    }
+}

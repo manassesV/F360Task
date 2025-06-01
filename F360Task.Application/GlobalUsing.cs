@@ -47,4 +47,6 @@ global using F360Task.Application.Queries.SchedulerReport;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Hosting;
 global using F360Task.Application.Validations;
+global using F360Task.Application.Extensions;
+global using F360Task.Application.Handler;
 

@@ -1,26 +1,37 @@
-﻿namespace F360Task.Application.Extensions;
+﻿using F360Task.Application.Validations;
+
+namespace F360Task.Application.Extensions;
 
 public static class ApplicationExtension
 {
     public static IHostApplicationBuilder AddAplication(this IHostApplicationBuilder builder)
     {
         
-        var service = builder.Services;
+        var services = builder.Services;
 
 
-        service.AddMediatR(cfg =>
+        services.AddMediatR(cfg =>
         {
-            cfg.RegisterServicesFromAssemblyContaining<CreateSchedullerEmailCommand>();
-            cfg.RegisterServicesFromAssemblyContaining<CreateSchedullerReportCommand>();
+            cfg.RegisterServicesFromAssembly(typeof(CreateSchedullerEmailCommand).Assembly);
+            cfg.RegisterServicesFromAssembly(typeof(CreateSchedullerReportCommand).Assembly);
+
+            cfg.RegisterServicesFromAssembly(typeof(IdentifiedCommandHandler<,>).Assembly);
+            cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
 
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
-        // Se estiver usando pipeline behavior de validação
-        builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+        //Request
+        services.AddScoped<IClienteRequestRepository, ClienteRequestRepository>();
+        services.AddScoped<IRequestManager, RequestManager>();
+
+        //Validator
+        services.AddSingleton<IValidator<CreateSchedullerEmailCommand>, CreateSchedulerEmailValidator>();
+        services.AddSingleton<IValidator<CreateSchedullerReportCommand>, CreateSchedullerReportValidator>();
 
         //Queries
-        service.AddScoped<ISchedulerEmailQueries, SchedulerEmailQueries>();
-        service.AddScoped<ISchedulerReportQueries, SchedulerReportQueries>();
+        services.AddScoped<ISchedulerEmailQueries, SchedulerEmailQueries>();
+        services.AddScoped<ISchedulerReportQueries, SchedulerReportQueries>();
 
         return builder;
     }

@@ -5,6 +5,6 @@ public class IdentifierCommandValidator<T>:AbstractValidator<IdentifiedCommand<T
 {
     public IdentifierCommandValidator()
     {
-        RuleFor(command => command.Id).NotEmpty();
+       // RuleFor(command => command.Id).NotEmpty();
     }
 }
