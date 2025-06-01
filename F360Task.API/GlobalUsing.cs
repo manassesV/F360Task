@@ -32,3 +32,4 @@ global using F360Task.Application.Extensions;
 global using F360Task.EventBusRabbitMQ.Extensions;
 global using F360Task.Infrastructure;
 global using System.Text.Json.Serialization;
+global using F360Task.API.Extensions;
