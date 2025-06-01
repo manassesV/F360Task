@@ -1,5 +1,4 @@
-﻿
-namespace F360Task.Infrastructure.Outbox;
+﻿namespace F360Task.Infrastructure.Outbox;
 
 public class OutboxMessageRepository : IOutboxMessageRepository
 {

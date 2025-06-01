@@ -8,7 +8,7 @@ public class SchedulerEmailRepository : ISchedulerEmailRepository
     {
         _context = context;
     }
-    public IUnitOfWork UnitOfWork => throw new NotImplementedException();
+    public IUnitOfWork UnitOfWork => _context;
 
     public async Task AddAsync(SchedulerEmail entity)
     {

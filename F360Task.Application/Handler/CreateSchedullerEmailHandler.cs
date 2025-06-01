@@ -33,11 +33,12 @@ public class CreateSchedullerEmailHandler : IRequestHandler<CreateSchedullerEmai
             await _transactionHandler.ExecuteAsync(async (session) =>
             {
                 await _schedulerEmailRepository.AddAsync(schedulerEmail);
+                await _schedulerEmailRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
 
                 var outboxPattern = new OutboxMessage("Email", nameof(CreateSchedullerEmailCommand), JsonSerializer.Serialize(schedulerEmail));
                 await _outboxMessageRepository.AddAsync(outboxPattern);
+                await _outboxMessageRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
 
-                await _schedulerEmailRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
             });
 
             return Result.Ok();
