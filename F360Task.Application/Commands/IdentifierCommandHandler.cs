@@ -1,4 +1,4 @@
-﻿namespace Fintech.Vitorino.CurrentAccount.Application.Commands;
+﻿namespace F360Task.Application.Commands;
 
 public class IdentifierCommandHandler<T, R> : IRequestHandler<IdentifiedCommand<T, R>, R>
     where T : IRequest<R>

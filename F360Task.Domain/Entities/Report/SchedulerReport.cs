@@ -8,7 +8,7 @@ public class SchedulerReport : Scheduler, IAggregateRoot
         DateTime periodStart,
         DateTime periodEnd)
     {
-       Type = SchedulerType.Report;
+        Type = SchedulerType.Report;
         ReportType = reportType;
         Format = format;
         PeriodStart = PeriodStart;

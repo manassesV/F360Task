@@ -1,4 +1,4 @@
-﻿namespace Fintech.Vitorino.CurrentAccount.Application.Commands;
+﻿namespace F360Task.Application.Commands;
 
 public class IdentifiedCommand<T, R>: IRequest<R>
     where T : IRequest<R>

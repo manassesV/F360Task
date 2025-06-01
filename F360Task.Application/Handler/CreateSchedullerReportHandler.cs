@@ -1,6 +1,6 @@
 ﻿namespace F360Task.Application.Handler;
 
-public class CreateSchedullerReportHandler : IRequestHandler<CreateSchedullerReport, Result>
+public class CreateSchedullerReportHandler : IRequestHandler<CreateSchedullerReportCommand, Result>
 {
     private readonly ISchedulerReportRepository _schedulerReportRepository;
     private readonly IOutboxMessageRepository _outboxMessageRepository;
@@ -17,7 +17,7 @@ public class CreateSchedullerReportHandler : IRequestHandler<CreateSchedullerRep
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _transactionHandler = transactionHandler ?? throw new ArgumentNullException(nameof(transactionHandler));
     }
-    public async Task<Result> Handle(CreateSchedullerReport createSchedullerReport, CancellationToken cancellationToken)
+    public async Task<Result> Handle(CreateSchedullerReportCommand createSchedullerReport, CancellationToken cancellationToken)
     {
         try
         {
@@ -34,7 +34,7 @@ public class CreateSchedullerReportHandler : IRequestHandler<CreateSchedullerRep
             {
                 await _schedulerReportRepository.AddAsync(schedulerReport);
 
-                var outboxPattern = new OutboxMessage("Report", nameof(CreateSchedullerReport), JsonSerializer.Serialize(schedulerReport));
+                var outboxPattern = new OutboxMessage("Report", nameof(CreateSchedullerReportCommand), JsonSerializer.Serialize(schedulerReport));
                 await _outboxMessageRepository.AddAsync(outboxPattern);
 
                 await _schedulerReportRepository.UnitOfWork.SaveChangesAsync(cancellationToken);

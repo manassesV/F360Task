@@ -2,7 +2,7 @@
 
 namespace F360Task.Application.Handler;
 
-public class CreateSchedullerEmailHandler : IRequestHandler<CreateSchedullerEmail, Result>
+public class CreateSchedullerEmailHandler : IRequestHandler<CreateSchedullerEmailCommand, Result>
 {
     private readonly ISchedulerEmailRepository _schedulerEmailRepository;
     private readonly IOutboxMessageRepository _outboxMessageRepository;
@@ -20,7 +20,7 @@ public class CreateSchedullerEmailHandler : IRequestHandler<CreateSchedullerEmai
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _transactionHandler = transactionHandler ?? throw new ArgumentNullException(nameof(transactionHandler));
     }
-    public async Task<Result> Handle(CreateSchedullerEmail createSchedullerEmail, CancellationToken cancellationToken)
+    public async Task<Result> Handle(CreateSchedullerEmailCommand createSchedullerEmail, CancellationToken cancellationToken)
     {
         try
         {
@@ -34,7 +34,7 @@ public class CreateSchedullerEmailHandler : IRequestHandler<CreateSchedullerEmai
             {
                 await _schedulerEmailRepository.AddAsync(schedulerEmail);
 
-                var outboxPattern = new OutboxMessage("Email", nameof(CreateSchedullerEmail), JsonSerializer.Serialize(schedulerEmail));
+                var outboxPattern = new OutboxMessage("Email", nameof(CreateSchedullerEmailCommand), JsonSerializer.Serialize(schedulerEmail));
                 await _outboxMessageRepository.AddAsync(outboxPattern);
 
                 await _schedulerEmailRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
