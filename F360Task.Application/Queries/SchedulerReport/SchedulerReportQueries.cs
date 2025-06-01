@@ -1,6 +1,6 @@
 ﻿namespace F360Task.Application.Queries.SchedulerReport;
 
-public class SchedulerReportQueries
+public class SchedulerReportQueries : ISchedulerReportQueries
 {
     private ApplicationDbContext _context;
 

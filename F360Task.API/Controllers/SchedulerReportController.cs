@@ -1,6 +1,4 @@
-﻿
-
-using FluentResults;
+﻿using FluentResults;
 
 namespace F360Task.API.Controllers;
 
