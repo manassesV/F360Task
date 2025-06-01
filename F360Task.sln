@@ -17,6 +17,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "F360Task.Application", "F36
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "F360Task.Infrastructure", "F360Task.Infrastructure\F360Task.Infrastructure.csproj", "{F8788FEF-74DF-4648-AE35-FAFE3ED9B10D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dockers", "dockers", "{69D16974-98B0-4975-A905-D72341FEA6A4}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,6 +61,15 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0F4A4AC2-107A-47A0-80AD-B234BF2D0D2B} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{B8831CF3-D2CD-4EAD-B528-AE48C250BBC7} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{5330015F-21BF-416D-9194-C48B39520338} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{E69999E9-45E4-49B8-BA74-194BC2000822} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{17703C84-CC4D-4E1A-BCF0-DE11C5464B03} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{A8EC8468-8C3E-475A-8317-843ED209204F} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{F8788FEF-74DF-4648-AE35-FAFE3ED9B10D} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5B544F70-78FB-4102-8663-AFBBF8D10FA8}
