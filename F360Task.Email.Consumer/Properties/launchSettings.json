@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "F360Task.Email.Consumer": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}

@@ -19,7 +19,6 @@ global using MongoFramework.Infrastructure.Diagnostics;
 global using F360Task.Domain.Seed;
 global using F360Task.Domain.AggregatesModel;
 global using F360Task.Domain.Entities.Email;
-global using F360Task.Domain.Entities.Report;
 
 // ========== Infrastructure ==========
 global using F360Task.Infrastructure.Exceptions;

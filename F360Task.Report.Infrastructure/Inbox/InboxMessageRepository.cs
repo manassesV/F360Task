@@ -2,11 +2,11 @@
 
 public class InboxMessageRepository : IInboxMessageRepository
 {
-    private readonly ApplicationDbContext _context;
+    private readonly ReportDbContext _context;
     public IUnitOfWork UnitOfWork => _context;
 
 
-    public InboxMessageRepository(ApplicationDbContext context)
+    public InboxMessageRepository(ReportDbContext context)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }

@@ -2,10 +2,10 @@
 
 public class OutboxMessageRepository : IOutboxMessageRepository
 {
-    private readonly ApplicationDbContext _context;
+    private readonly ReportDbContext _context;
     public IUnitOfWork UnitOfWork => _context;
 
-    public OutboxMessageRepository(ApplicationDbContext context)
+    public OutboxMessageRepository(ReportDbContext context)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }

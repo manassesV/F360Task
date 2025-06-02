@@ -32,7 +32,7 @@ public static class InfrastructureExtension
             return new MongoDbConnection(client, url);
         });
 
-        services.AddScoped<ApplicationDbContext>();
+        services.AddScoped<EmailDbContext>();
         services.AddScoped<ITransactionHandler<IClientSessionHandle>, TransactionHandler>();
 
 
@@ -44,7 +44,6 @@ public static class InfrastructureExtension
         services.AddScoped<IInboxMessageRepository, InboxMessageRepository>();
         services.AddScoped<IOutboxMessageRepository, OutboxMessageRepository>();
         services.AddScoped<ISchedulerEmailRepository, SchedulerEmailRepository>();
-        services.AddScoped<ISchedulerReportRepository, SchedulerReportRepository>();
 
         return services;
     }

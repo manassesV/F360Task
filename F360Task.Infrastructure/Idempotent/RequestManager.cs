@@ -5,7 +5,7 @@ public class RequestManager : IRequestManager
     private readonly ITransactionHandler<IClientSessionHandle> _transactionHandler;
     private readonly IClienteRequestRepository _clienteRequestRepository;
 
-    public RequestManager(ApplicationDbContext context,
+    public RequestManager(EmailDbContext context,
         ILogger<RequestManager> logger,
         ITransactionHandler<IClientSessionHandle> transactionHandler,
         IClienteRequestRepository clienteRequestRepository)

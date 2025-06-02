@@ -13,7 +13,6 @@ public static class ApplicationExtension
         services.AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssembly(typeof(CreateSchedullerEmailCommand).Assembly);
-            cfg.RegisterServicesFromAssembly(typeof(CreateSchedullerReportCommand).Assembly);
 
             cfg.RegisterServicesFromAssembly(typeof(IdentifiedCommandHandler<,>).Assembly);
             cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
@@ -27,11 +26,9 @@ public static class ApplicationExtension
 
         //Validator
         services.AddSingleton<IValidator<CreateSchedullerEmailCommand>, CreateSchedulerEmailValidator>();
-        services.AddSingleton<IValidator<CreateSchedullerReportCommand>, CreateSchedullerReportValidator>();
 
         //Queries
         services.AddScoped<ISchedulerEmailQueries, SchedulerEmailQueries>();
-        services.AddScoped<ISchedulerReportQueries, SchedulerReportQueries>();
 
         return builder;
     }

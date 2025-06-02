@@ -9,4 +9,3 @@ global using MediatR;                          // Biblioteca CQRS (Command/Query
 global using F360Task.Domain.Seed;             // Interfaces e contratos base do domínio
 global using F360Task.Domain.Events;           // Eventos de domínio (Domain Events)
 global using F360Task.Domain.Entities.Email;   // Entidades relacionadas a e-mails
-global using F360Task.Domain.Entities.Report;  // Entidades relacionadas a relatórios

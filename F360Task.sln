@@ -39,8 +39,15 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "F360Task.SharedKernel.Tests", "F360Task.SharedKernel.Tests\F360Task.SharedKernel.Tests.csproj", "{053F7036-2FCE-4C79-B5DC-C5FFEBC6F38C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Email", "Email", "{1144E60E-8D09-480C-9157-8B6801ECC0CD}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\..\Downloads\docker-compose.yml = ..\..\..\..\Downloads\docker-compose.yml
+		F360Task.API\GlobalUsing.cs = F360Task.API\GlobalUsing.cs
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Report", "Report", "{69DE6C15-EAA2-4083-B6B9-B6F6AB48DC61}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\..\Downloads\docker-compose.yml = ..\..\..\..\Downloads\docker-compose.yml
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "F360Task.Email.Consumer", "F360Task.Email.Consumer\F360Task.Email.Consumer.csproj", "{8B2BA9D9-7EF2-46CC-A39F-1578A958F6C3}"
 EndProject
