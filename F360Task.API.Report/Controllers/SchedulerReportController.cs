@@ -1,8 +1,10 @@
-﻿namespace F360Task.API.Report.Controllers;
+﻿using F360Task.Report.Application.Queries.SchedulerReport;
 
-public class SchedulerReportController : BaseController<CreateSchedullerReportCommand, ISchedulerEmailQueries, Result>
+namespace F360Task.API.Report.Controllers;
+
+public class SchedulerReportController : BaseController<CreateSchedullerReportCommand, ISchedulerReportQueries, Result>
 {
-    public SchedulerReportController(ILogger<BaseController<CreateSchedullerReportCommand, ISchedulerEmailQueries, Result>> logger, IMediator mediator) : base(logger, mediator)
+    public SchedulerReportController(ILogger<BaseController<CreateSchedullerReportCommand, ISchedulerReportQueries, Result>> logger, IMediator mediator) : base(logger, mediator)
     {
     }
 
@@ -45,14 +47,14 @@ public class SchedulerReportController : BaseController<CreateSchedullerReportCo
         return Ok(result);
     }
 
-    public override async Task<ActionResult<Result>> FindAllAsync([FromServices] ISchedulerEmailQueries service, CancellationToken cancellationToken)
+    public override async Task<ActionResult<Result>> FindAllAsync([FromServices] ISchedulerReportQueries service, CancellationToken cancellationToken)
     {
         var results = await service.FindAllAsync();
 
         return Ok(results);
     }
 
-    public override async Task<ActionResult<Result>> FindByIdAsync([FromServices] ISchedulerEmailQueries service, Guid id, CancellationToken cancellationToken)
+    public override async Task<ActionResult<Result>> FindByIdAsync([FromServices] ISchedulerReportQueries service, Guid id, CancellationToken cancellationToken)
     {
         var result = await service.FindByIdAsync(id);
 

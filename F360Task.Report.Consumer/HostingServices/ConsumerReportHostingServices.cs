@@ -35,13 +35,13 @@ public class ConsumerReportHostingServices : IHostedService, IDisposable
 
                 foreach (var message in inboxMessages)
                 {
-                   //await  _transactionHandler.ExecuteAsync(async (data) =>
-                   // {
-                        message.ChangeToProcessed();
-                        await _inboxRepository.UpdateAsync(message);
-                        await _inboxRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
-                    //});
-                
+                    await _transactionHandler.ExecuteAsync(async (data) =>
+                     {
+                         message.ChangeToProcessed();
+                         await _inboxRepository.UpdateAsync(message);
+                         await _inboxRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
+                     });
+
 
                 }
 

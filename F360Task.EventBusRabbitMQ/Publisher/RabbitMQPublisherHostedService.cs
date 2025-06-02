@@ -1,6 +1,4 @@
-﻿using System.Threading;
-
-namespace F360Task.EventBusRabbitMQ.Publisher;
+﻿namespace F360Task.EventBusRabbitMQ.Publisher;
 
 public class RabbitMQPublisherHostedService : BackgroundService
 {

@@ -19,8 +19,8 @@
 		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.1" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\F360Task.Application\F360Task.Application.csproj" />
 		<ProjectReference Include="..\F360Task.EventBusRabbitMQ\F360Task.EventBusRabbitMQ.csproj" />
-		<ProjectReference Include="..\F360Task.Infrastructure\F360Task.Infrastructure.csproj" />
+		<ProjectReference Include="..\F360Task.Report.Application\F360Task.Report.Application.csproj" />
+		<ProjectReference Include="..\F360Task.Report.Infrastructure\F360Task.Report.Infrastructure.csproj" />
 	</ItemGroup>
 </Project>

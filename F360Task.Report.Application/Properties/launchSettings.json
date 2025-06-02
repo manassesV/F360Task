@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "F360Task.Report.Application": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
