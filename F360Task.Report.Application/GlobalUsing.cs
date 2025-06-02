@@ -48,3 +48,4 @@ global using F360Task.Report.Application.Handler;
 global using F360Task.Report.Domain.AggregatesModel;
 global using F360Task.Report.Domain.Entities.Report;
 global using F360Task.Report.Infrastructure;
+global using F360Task.Report.Domain.Seed;

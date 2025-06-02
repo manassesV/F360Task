@@ -1,10 +1,11 @@
 ﻿global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Hosting;
-global using F360Task.Infrastructure.Inbox;
+global using F360Task.Report.Infrastructure.Inbox;
 global using Microsoft.Extensions.Logging;
-global using F360Task.Infrastructure;
-global using F360Task.Domain.Seed;
-global using F360Task.Infrastructure.Transactions;
+global using F360Task.Report.Infrastructure;
+global using F360Task.Report.Domain.Seed;
+global using F360Task.Report.Infrastructure.Transactions;
 global using MongoDB.Driver;
 global using F360Task.Report.Consumer.Configurations;
 global using F360Task.Report.Consumer.Extensions;
+global using F360Task.Report.Domain.Seed;

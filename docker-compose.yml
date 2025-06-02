@@ -1,41 +1,68 @@
 services:
-  # RabbitMQ com Management UI
+  # MongoDB Service
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS:-admin123}
+    volumes:
+      - mongodb_data:/data/db
+
+  # RabbitMQ with Management UI
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # Management UI
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
 
-  # Zookeeper para Kafka
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.6.0
-    container_name: zookeeper
+  # API Email Service
+  f360taskapiemail:
+    build:
+      context: .
+      dockerfile: F360Task.API.Email/Dockerfile
+    container_name: f360taskapiemail
     ports:
-      - "2181:2181"
+      - "5000:80"      # HTTP
+      - "5001:443"     # HTTPS
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
+      ASPNETCORE_ENVIRONMENT: ${APP_ENV:-Development}
+      ConnectionStrings__MongoDB: "mongodb://${MONGO_USER:-admin}:${MONGO_PASS:-admin123}@mongodb:27017"
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Port: 5672
 
-  # Kafka broker
-  kafka:
-    image: confluentinc/cp-kafka:7.6.0
-    container_name: kafka
+  # API Report Service
+  f360taskapireport:
+    build:
+      context: .
+      dockerfile: F360Task.API.Report/Dockerfile
+    container_name: f360taskapireport
     ports:
-      - "9092:9092"
-    depends_on:
-      - zookeeper
+      - "5010:80"      # HTTP (different from Email API)
+      - "5011:443"     # HTTPS (different from Email API)
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
- 
+      ASPNETCORE_ENVIRONMENT: ${APP_ENV:-Development}
+      ConnectionStrings__MongoDB: "mongodb://${MONGO_USER:-admin}:${MONGO_PASS:-admin123}@mongodb:27017"
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Port: 5672
+
+  # Email Consumer Service
+  f360taskconsumeremail:
+    build:
+      context: .
+      dockerfile: F360Task.Email.Consumer/Dockerfile
+    container_name: f360taskconsumeremail
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${APP_ENV:-Development}
+      ConnectionStrings__MongoDB: "mongodb://${MONGO_USER:-admin}:${MONGO_PASS:-admin123}@mongodb:27017"
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Port: 5672
+
+volumes:
+  mongodb_data:

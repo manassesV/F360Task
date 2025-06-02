@@ -31,6 +31,7 @@ public class RabbitMQConsumerHostedService : IHostedService
             await _retryResiliency.ExecuteAsync(async () =>
             {
                 await _rabbitMqConsumer.Consumer(
+                    "Email",
                     queueName: "CreateSchedullerEmail",
                     consumerTag: "f360_exchange",
                     cancellationToken);
