@@ -13,7 +13,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\F360Task.Infrastructure\F360Task.Infrastructure.csproj" />
+	  <ProjectReference Include="..\F360Task.Report.Infrastructure\F360Task.Report.Infrastructure.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="appsettings.json">
