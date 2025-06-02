@@ -13,6 +13,12 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["F360Task.API/F360Task.API.csproj", "F360Task.API/"]
+COPY ["F360Task.Application/F360Task.Application.csproj", "F360Task.Application/"]
+COPY ["F360Task.Infrastructure/F360Task.Infrastructure.csproj", "F360Task.Infrastructure/"]
+COPY ["F360Task.Domain/F360Task.Domain.csproj", "F360Task.Domain/"]
+COPY ["F360Task.EventBusRabbitMQ/F360Task.EventBusRabbitMQ.csproj", "F360Task.EventBusRabbitMQ/"]
+COPY ["F360Task.EventBus/F360Task.EventBus.csproj", "F360Task.EventBus/"]
+COPY ["F360Task.SharedKernel/F360Task.SharedKernel.csproj", "F360Task.SharedKernel/"]
 RUN dotnet restore "./F360Task.API/F360Task.API.csproj"
 COPY . .
 WORKDIR "/src/F360Task.API"

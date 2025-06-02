@@ -68,9 +68,10 @@ public static class RabbitMqDependencyInjectionExtensions
 
         services.AddHostedService<RabbitMQInitializerHostedService>();
 
-        services.AddRabbitMQConsumer();
 
         services.AddRabbitMQPublisher();
+        services.AddRabbitMQConsumer();
+
 
         return builder;
     }

@@ -1,6 +1,4 @@
-﻿using MongoDB.Driver;
-
-namespace F360Task.Infrastructure.Transactions;
+﻿namespace F360Task.Infrastructure.Transactions;
 
 
 public class TransactionHandler : ITransactionHandler<IClientSessionHandle>
