@@ -1,4 +1,6 @@
-﻿namespace F360Task.EventBusRabbitMQ.Publisher;
+﻿using System.Threading;
+
+namespace F360Task.EventBusRabbitMQ.Publisher;
 
 public class RabbitMQPublisherHostedService : BackgroundService
 {
@@ -15,15 +17,15 @@ public class RabbitMQPublisherHostedService : BackgroundService
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Outbox Processor Service starting");
 
         using var timer = new PeriodicTimer(_pollingInterval);
         var retryCount = 0;
 
-        while (!stoppingToken.IsCancellationRequested &&
-               await timer.WaitForNextTickAsync(stoppingToken))
+        while (await timer.WaitForNextTickAsync(cancellationToken))
+
         {
             try
             {
@@ -37,8 +39,8 @@ public class RabbitMQPublisherHostedService : BackgroundService
                         .GetRequiredService<ITransactionHandler<IClientSessionHandle>>();
                     var outbox = new OutboxMessage("Email", "CreateSchedullerEmail", "Email");
                     await repository.AddAsync(outbox);
-                    await repository.UnitOfWork.SaveChangesAsync(stoppingToken);
-                    await ProcessMessagesAsync(repository, publisher, transactionHandler, stoppingToken);
+                    await repository.UnitOfWork.SaveChangesAsync(cancellationToken);
+                    await ProcessMessagesAsync(repository, publisher, transactionHandler, cancellationToken);
                     retryCount = 0; ;
                 }
             }
@@ -51,7 +53,7 @@ public class RabbitMQPublisherHostedService : BackgroundService
             {
                 _logger.LogError(ex, "Error processing outbox messages (Retry {RetryCount}/{MaxRetries})",
                     retryCount, MaxRetryCount);
-                await Task.Delay(5000, stoppingToken);
+                await Task.Delay(5000, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -108,8 +110,7 @@ public class RabbitMQPublisherHostedService : BackgroundService
 
             var payload = Encoding.UTF8.GetBytes(message.Payload);
 
-            await transactionHandler.ExecuteAsync(async session =>
-            {
+           
                 await publisher.Publish(
                     exchange: message.Exchange,
                     queueName: message.Queue,
@@ -120,7 +121,7 @@ public class RabbitMQPublisherHostedService : BackgroundService
                     cancellationToken: cancellationToken);
 
                 await MarkMessageAsProcessed(message, repository, transactionHandler, true);
-            }, cancellationToken);
+            
         }
         catch (Exception ex)
         {

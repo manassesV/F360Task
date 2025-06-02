@@ -1,8 +1,4 @@
-﻿using F360Task.Infrastructure.Inbox;
-using MongoDB.Driver.Linq;
-using MongoFramework.Infrastructure.Diagnostics;
-
-namespace F360Task.Infrastructure;
+﻿namespace F360Task.Infrastructure;
 
 public static class InfrastructureExtension
 {

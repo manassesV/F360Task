@@ -1,6 +1,4 @@
-﻿using SharpCompress.Common;
-
-namespace F360Task.Infrastructure.Inbox;
+﻿namespace F360Task.Infrastructure.Inbox;
 
 public class InboxMessageRepository : IInboxMessageRepository
 {
@@ -32,9 +30,14 @@ public class InboxMessageRepository : IInboxMessageRepository
     {
         return _context.InboxMessage
             .AsNoTracking()
-            .Where(p => p.Processed)
+            .Where(p => p.Processed == processed)
             .OrderBy(c => c.ProcessedAt)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task UpdateAsync(InboxMessage inboxMessage)
+    {
+        _context.InboxMessage.Update(inboxMessage);
     }
 }
 

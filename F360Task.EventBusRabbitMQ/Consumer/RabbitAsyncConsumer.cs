@@ -17,13 +17,18 @@ public class RabbitAsyncConsumer : IRabbitAsyncConsumer
         IServiceScopeFactory scopeFactory)
     {
         _rabbitMQConnectionProvider = rabbitMQConnectionProvider;
-        _connection = _rabbitMQConnectionProvider.GetConnection();
         _logger = logger;
         _inboxMessageRepository = inboxMessageRepository;
         _scopeFactory = scopeFactory;
     }
 
-    public IChannel? Channel =>  _connection.CreateChannelAsync().Result;
+    public IChannel? Channel =>  _channel;
+    private IChannel _channel;
+
+    public void SetChannel(IChannel channel)
+    {
+        _channel = channel;
+    }
 
     public async Task HandleBasicCancelAsync(string consumerTag, CancellationToken cancellationToken = default)
     {
@@ -56,6 +61,7 @@ public class RabbitAsyncConsumer : IRabbitAsyncConsumer
 
         try
         {
+        
             _logger.LogInformation("RabbitMQ: Message delivered. ConsumerTag: {ConsumerTag}, DeliveryTag: {DeliveryTag}, Redelivered: {Redelivered}, Exchange: {Exchange}, RoutingKey: {RoutingKey}",
            consumerTag, deliveryTag, redelivered, exchange, routingKey);
 
@@ -75,14 +81,20 @@ public class RabbitAsyncConsumer : IRabbitAsyncConsumer
             var messageText = Encoding.UTF8.GetString(body.Span);
             var inboxMessage = new InboxMessage(messageId, messageText);
 
-            await transactionHandler.ExecuteAsync(async (clienthandler) =>
+           
+            await _inboxMessageRepository.AddAsync(inboxMessage);
+            await _inboxMessageRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
+           
+
+            if (Channel.IsOpen)
             {
-                await _inboxMessageRepository.AddAsync(inboxMessage);
-                await _inboxMessageRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
+               await Channel.BasicAckAsync(deliveryTag, multiple: false, cancellationToken);
+            }
+            else
+            {
+                _logger.LogWarning("Canal RabbitMQ fechado ao tentar dar ACK");
+            }
 
-                await Channel.BasicAckAsync(deliveryTag, multiple: false, cancellationToken);
-
-            });
 
         }
         catch (Exception ex)

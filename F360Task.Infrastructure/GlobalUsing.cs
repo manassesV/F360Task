@@ -11,6 +11,9 @@ global using Microsoft.Extensions.Hosting;
 global using MongoDB.Driver;
 global using MongoFramework;
 global using MongoFramework.Linq;
+global using MongoDB.Driver.Linq;
+global using MongoFramework.Infrastructure.Diagnostics;
+
 
 // ========== Domain ==========
 global using F360Task.Domain.Seed;

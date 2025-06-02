@@ -8,11 +8,11 @@ public class InboxMessage
         ReceivedAt = DateTime.Now;
     }
 
-    public string Id { get; set; }
-    public string Payload { get; set; }
-    public bool Processed { get; set; }
-    public DateTime ReceivedAt { get; set; }
-    public DateTime? ProcessedAt { get; set; }
+    public string Id { get; private set; }
+    public string Payload { get; private set; }
+    public bool Processed { get; private set; }
+    public DateTime ReceivedAt { get; private set; }
+    public DateTime? ProcessedAt { get; private set; }
 
     public void ChangeToProcessed()
     {

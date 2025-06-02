@@ -1,7 +1,4 @@
-﻿using F360Task.Application.Commands;
-using FluentResults;
-
-namespace F360Task.API.Controllers;
+﻿namespace F360Task.API.Report.Controllers;
 
 public class SchedulerReportController : BaseController<CreateSchedullerReportCommand, ISchedulerEmailQueries, Result>
 {
