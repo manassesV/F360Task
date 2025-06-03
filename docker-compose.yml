@@ -25,27 +25,28 @@ services:
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
 
   # # API Email Service
-  # f360taskapiemail:
-  #   build:
-  #     context: .
-  #     dockerfile: F360Task.API/Dockerfile
-  #   container_name: f360taskapiemail
-  #   ports:
-  #     - "5000:80"
-  #     - "5001:443"
-  #   depends_on:
-  #     - rabbitmq
-  #   environment:
-  #     ASPNETCORE_ENVIRONMENT: Development
-  #     ConnectionStrings__MongoDB: "mongodb+srv://projeto:projeto@cluster0.lif5jbi.mongodb.net/Email?retryWrites=true&w=majority&appName=Cluster0"
-  #     RabbitMQ__HostName: rabbitmq
-  #     RabbitMQ__UserName: ${RABBITMQ_USER:-guest}
-  #     RabbitMQ__Password: ${RABBITMQ_PASS:-guest}
-  #     RabbitMQ__VirtualHost: "/"
-  #     RabbitMQ__Port: 5672
-  #     RabbitMQ__Exchange: "Email"
-  #     RabbitMQ__Queue: "EnviarEmail"
-  #     RabbitMQ__ConsumerTag: "EnviarEmail"
+  f360taskapiemail:
+    build:
+      context: .
+      dockerfile: F360Task.API/Dockerfile
+    container_name: f360taskapiemail
+    ports:
+      - "5000:8080"
+      - "5001:8081"
+    depends_on:
+      - rabbitmq
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__MongoDB: "mongodb+srv://projeto:projeto@cluster0.lif5jbi.mongodb.net/Email?retryWrites=true&w=majority&appName=Cluster0"
+      RabbitMQ__HostName: rabbitmq
+      RabbitMQ__UserName: ${RABBITMQ_USER:-guest}
+      RabbitMQ__Password: ${RABBITMQ_PASS:-guest}
+      RabbitMQ__VirtualHost: "/"
+      RabbitMQ__Port: 5672
+      RabbitMQ__Exchange: "Email"
+      RabbitMQ__Queue: "EnviarEmail"
+      RabbitMQ__ConsumerTag: "EnviarEmail"
 
   # API Report Service
   f360taskapireport:
@@ -54,12 +55,13 @@ services:
       dockerfile: F360Task.API.Report/Dockerfile
     container_name: f360taskapireport
     ports:
-      - "5010:80"
-      - "5011:443"
+      - "5010:8080"
+      - "5011:8081"
     depends_on:
       - rabbitmq
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__MongoDB: "mongodb+srv://projeto:projeto@cluster0.lif5jbi.mongodb.net/Email?retryWrites=true&w=majority&appName=Cluster0"
       RabbitMQ__HostName: rabbitmq
       RabbitMQ__UserName: ${RABBITMQ_USER:-guest}
@@ -71,44 +73,48 @@ services:
       RabbitMQ__ConsumerTag: "GerarReport"
 
   # Email Consumer Service
-  # f360taskconsumeremail:
-  #   build:
-  #     context: .
-  #     dockerfile: F360Task.Email.Consumer/Dockerfile
-  #   container_name: f360taskconsumeremail
-  #   depends_on:
-  #     - rabbitmq
-  #   environment:
-  #     ASPNETCORE_ENVIRONMENT: Development
-  #     ConnectionStrings__MongoDB: "mongodb+srv://projeto:projeto@cluster0.lif5jbi.mongodb.net/Email?retryWrites=true&w=majority&appName=Cluster0"
-  #     RabbitMQ__HostName: rabbitmq
-  #     RabbitMQ__UserName: ${RABBITMQ_USER:-guest}
-  #     RabbitMQ__Password: ${RABBITMQ_PASS:-guest}
-  #     RabbitMQ__VirtualHost: "/"
-  #     RabbitMQ__Port: 5672
-  #     RabbitMQ__Exchange: "Email"
-  #     RabbitMQ__Queue: "EnviarEmail"
-  #     RabbitMQ__ConsumerTag: "EnviarEmail"
+  f360taskconsumeremail:
+    build:
+      context: .
+      dockerfile: F360Task.Email.Consumer/Dockerfile
+    container_name: f360taskconsumeremail
+    depends_on:
+      - rabbitmq
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__MongoDB: "mongodb+srv://projeto:projeto@cluster0.lif5jbi.mongodb.net/Email?retryWrites=true&w=majority&appName=Cluster0"
+      RabbitMQ__HostName: rabbitmq
+      RabbitMQ__UserName: ${RABBITMQ_USER:-guest}
+      RabbitMQ__Password: ${RABBITMQ_PASS:-guest}
+      RabbitMQ__VirtualHost: "/"
+      RabbitMQ__Port: 5672
+      RabbitMQ__Exchange: "Email"
+      RabbitMQ__Queue: "EnviarEmail"
+      RabbitMQ__ConsumerTag: "EnviarEmail"
 
   # Report Consumer Service
-  # f360taskconsumerreport:
-  #   build:
-  #     context: .
-  #     dockerfile: F360Task.Report.Consumer/Dockerfile
-  #   container_name: f360taskconsumerreport
-  #   depends_on:
-  #     - rabbitmq
-  #   environment:
-  #     ASPNETCORE_ENVIRONMENT: Development
-  #     ConnectionStrings__MongoDB: "mongodb+srv://projeto:projeto@cluster0.lif5jbi.mongodb.net/Email?retryWrites=true&w=majority&appName=Cluster0"
-  #     RabbitMQ__HostName: rabbitmq
-  #     RabbitMQ__UserName: ${RABBITMQ_USER:-guest}
-  #     RabbitMQ__Password: ${RABBITMQ_PASS:-guest}
-  #     RabbitMQ__VirtualHost: "/"
-  #     RabbitMQ__Port: 5672
-  #     RabbitMQ__Exchange: "Report"
-  #     RabbitMQ__Queue: "GerarReport"
-  #     RabbitMQ__ConsumerTag: "GerarReport"
+  f360taskconsumerreport:
+    build:
+      context: .
+      dockerfile: F360Task.Report.Consumer/Dockerfile
+    container_name: f360taskconsumerreport
+    depends_on:
+      - rabbitmq
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__MongoDB: "mongodb+srv://projeto:projeto@cluster0.lif5jbi.mongodb.net/Email?retryWrites=true&w=majority&appName=Cluster0"
+      RabbitMQ__HostName: rabbitmq
+      RabbitMQ__UserName: ${RABBITMQ_USER:-guest}
+      RabbitMQ__Password: ${RABBITMQ_PASS:-guest}
+      RabbitMQ__VirtualHost: "/"
+      RabbitMQ__Port: 5672
+      RabbitMQ__Exchange: "Report"
+      RabbitMQ__Queue: "GerarReport"
+      RabbitMQ__ConsumerTag: "GerarReport"
 
 volumes:
-  mongodb_data:
+  mongodb_data: 
+  
+      
