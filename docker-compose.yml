@@ -21,8 +21,8 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - "5672:5672"    # AMQP
-      - "15672:15672"  # Management UI
+      - "5672:5672"
+      - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
@@ -91,6 +91,8 @@ services:
       context: .
       dockerfile: F360Task.Email.Consumer/Dockerfile
     container_name: f360taskconsumeremail
+    ports:
+      - "5020:8080"
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -115,6 +117,8 @@ services:
       context: .
       dockerfile: F360Task.Report.Consumer/Dockerfile
     container_name: f360taskconsumerreport
+    ports:
+      - "5030:8080"
     depends_on:
       rabbitmq:
         condition: service_healthy

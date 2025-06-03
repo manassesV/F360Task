@@ -26,7 +26,7 @@ public class RabbitMqConsumer : IRabbitMqConsumer
         try
         {
 
-            var channel = await _rabbitMQConnectionProvider.GetChannel();
+            var channel = await _rabbitMQConnectionProvider.GetConsumerChannel();
             _rabbitAsyncConsumer.SetChannel(channel); // ← canal correto sendo passado
 
             await EnsureQueueBoundAsync(exchange, queueName, channel);

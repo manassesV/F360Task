@@ -52,7 +52,7 @@ public class RabbitMqPublisher : IRabbitMqPublisher
     {
 
 
-        var channel = await _rabbitMQConnectionProvider.GetChannel();
+        var channel = await _rabbitMQConnectionProvider.GetPublishChannel();
 
         await EnsureQueueBoundAsync(exchange, queueName, routingKey, channel, cancellationToken: cancellationToken);
     
