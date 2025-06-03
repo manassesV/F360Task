@@ -11,6 +11,9 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["F360Task.Report.Consumer/F360Task.Report.Consumer.csproj", "F360Task.Report.Consumer/"]
+COPY ["F360Task.Report.Infrastructure/F360Task.Report.Infrastructure.csproj", "F360Task.Report.Infrastructure/"]
+COPY ["F360Task.Report.Domain/F360Task.Report.Domain.csproj", "F360Task.Report.Domain/"]
+COPY ["F360Task.SharedKernel/F360Task.SharedKernel.csproj", "F360Task.SharedKernel/"]
 RUN dotnet restore "./F360Task.Report.Consumer/F360Task.Report.Consumer.csproj"
 COPY . .
 WORKDIR "/src/F360Task.Report.Consumer"

@@ -15,8 +15,8 @@ public static class ApiExtension
                      {
                          options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                      });
-        services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
         builder.Services.AddCors(options =>
         {
 

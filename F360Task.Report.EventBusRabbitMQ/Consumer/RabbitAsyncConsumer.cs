@@ -1,4 +1,4 @@
-﻿namespace F360Task.EventBusRabbitMQ.Consumer;
+﻿namespace F360Task.Report.EventBusRabbitMQ.Consumer;
 
 public class RabbitAsyncConsumer : IRabbitAsyncConsumer
 {

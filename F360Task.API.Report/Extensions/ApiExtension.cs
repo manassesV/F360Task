@@ -5,8 +5,8 @@ public static class ApiExtension
     public static IHostApplicationBuilder AddApi(this IHostApplicationBuilder builder)
     {
         builder.AddAplication();
-        builder.AddRabbitMqEventBus();
         builder.AddInfrastructure();
+        builder.AddRabbitMqEventBus();
 
         var services = builder.Services;
 

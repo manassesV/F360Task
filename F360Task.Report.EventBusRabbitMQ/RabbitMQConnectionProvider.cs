@@ -1,6 +1,4 @@
-﻿using Polly.Retry;
-
-namespace F360Task.EventBusRabbitMQ;
+﻿namespace F360Task.Report.EventBusRabbitMQ;
 
 public class RabbitMQConnectionProvider : IRabbitMQConnectionProvider
 {

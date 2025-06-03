@@ -1,4 +1,4 @@
-﻿namespace F360Task.EventBusRabbitMQ.Publisher;
+﻿namespace F360Task.Report.EventBusRabbitMQ.Publisher;
 
 public class RabbitMqPublisher : IRabbitMqPublisher
 {
