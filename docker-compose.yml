@@ -62,7 +62,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__MongoDB: "mongodb+srv://projeto:projeto@cluster0.lif5jbi.mongodb.net/Email?retryWrites=true&w=majority&appName=Cluster0"
+      ConnectionStrings__MongoDB: "mongodb+srv://projeto:projeto@cluster0.lif5jbi.mongodb.net/Report?retryWrites=true&w=majority&appName=Cluster0"
       RabbitMQ__HostName: rabbitmq
       RabbitMQ__UserName: ${RABBITMQ_USER:-guest}
       RabbitMQ__Password: ${RABBITMQ_PASS:-guest}
@@ -104,7 +104,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__MongoDB: "mongodb+srv://projeto:projeto@cluster0.lif5jbi.mongodb.net/Email?retryWrites=true&w=majority&appName=Cluster0"
+      ConnectionStrings__MongoDB: "mongodb+srv://projeto:projeto@cluster0.lif5jbi.mongodb.net/Report?retryWrites=true&w=majority&appName=Cluster0"
       RabbitMQ__HostName: rabbitmq
       RabbitMQ__UserName: ${RABBITMQ_USER:-guest}
       RabbitMQ__Password: ${RABBITMQ_PASS:-guest}
