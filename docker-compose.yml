@@ -26,16 +26,19 @@ services:
   f360taskapiemail:
     build:
       context: .
-      dockerfile: F360Task.API.Email/Dockerfile
+      dockerfile: F360Task.API/Dockerfile
     container_name: f360taskapiemail
     ports:
-      - "5000:80"      # HTTP
-      - "5001:443"     # HTTPS
+      - "5000:80"
+      - "5001:443"
     environment:
       ASPNETCORE_ENVIRONMENT: ${APP_ENV:-Development}
-      ConnectionStrings__MongoDB: "mongodb://${MONGO_USER:-admin}:${MONGO_PASS:-admin123}@mongodb:27017"
+      ConnectionStrings__MongoDB: "mongodb+srv://projeto:projeto@cluster0.lif5jbi.mongodb.net/Email?retryWrites=true&w=majority&appName=Cluster0"
       RabbitMQ__Host: rabbitmq
       RabbitMQ__Port: 5672
+      RabbitMQ__Exchange: "Email"
+      RabbitMQ__Queue: "EnviarEmail"
+      RabbitMQ__ConsumerTag: "EnviarEmail"
 
   # API Report Service
   f360taskapireport:
@@ -44,13 +47,16 @@ services:
       dockerfile: F360Task.API.Report/Dockerfile
     container_name: f360taskapireport
     ports:
-      - "5010:80"      # HTTP (different from Email API)
-      - "5011:443"     # HTTPS (different from Email API)
+      - "5010:80"
+      - "5011:443"
     environment:
       ASPNETCORE_ENVIRONMENT: ${APP_ENV:-Development}
-      ConnectionStrings__MongoDB: "mongodb://${MONGO_USER:-admin}:${MONGO_PASS:-admin123}@mongodb:27017"
+      ConnectionStrings__MongoDB: "mongodb+srv://projeto:projeto@cluster0.lif5jbi.mongodb.net/Email?retryWrites=true&w=majority&appName=Cluster0"
       RabbitMQ__Host: rabbitmq
       RabbitMQ__Port: 5672
+      RabbitMQ__Exchange: "Report"
+      RabbitMQ__Queue: "GerarReport"
+      RabbitMQ__ConsumerTag: "GerarReport"
 
   # Email Consumer Service
   f360taskconsumeremail:
@@ -60,9 +66,27 @@ services:
     container_name: f360taskconsumeremail
     environment:
       ASPNETCORE_ENVIRONMENT: ${APP_ENV:-Development}
-      ConnectionStrings__MongoDB: "mongodb://${MONGO_USER:-admin}:${MONGO_PASS:-admin123}@mongodb:27017"
+      ConnectionStrings__MongoDB: "mongodb+srv://projeto:projeto@cluster0.lif5jbi.mongodb.net/Email?retryWrites=true&w=majority&appName=Cluster0"
       RabbitMQ__Host: rabbitmq
       RabbitMQ__Port: 5672
+      RabbitMQ__Exchange: "Email"
+      RabbitMQ__Queue: "EnviarEmail"
+      RabbitMQ__ConsumerTag: "EnviarEmail"
+
+  # Report Consumer Service
+  f360taskconsumerreport:
+    build:
+      context: .
+      dockerfile: F360Task.Report.Consumer/Dockerfile
+    container_name: f360taskconsumerreport
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${APP_ENV:-Development}
+      ConnectionStrings__MongoDB: "mongodb+srv://projeto:projeto@cluster0.lif5jbi.mongodb.net/Email?retryWrites=true&w=majority&appName=Cluster0"
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Port: 5672
+      RabbitMQ__Exchange: "Report"
+      RabbitMQ__Queue: "GerarReport"
+      RabbitMQ__ConsumerTag: "GerarReport"
 
 volumes:
   mongodb_data:

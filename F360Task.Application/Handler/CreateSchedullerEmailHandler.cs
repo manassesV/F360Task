@@ -1,4 +1,5 @@
 ﻿using F360Task.Domain.Entities.Email;
+using Microsoft.Extensions.Options;
 
 namespace F360Task.Application.Handler;
 
@@ -35,7 +36,7 @@ public class CreateSchedullerEmailHandler : IRequestHandler<CreateSchedullerEmai
                 await _schedulerEmailRepository.AddAsync(schedulerEmail);
                 await _schedulerEmailRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
 
-                var outboxPattern = new OutboxMessage("Email", nameof(CreateSchedullerEmailCommand), JsonSerializer.Serialize(schedulerEmail));
+                var outboxPattern = new OutboxMessage("Email", "EnviarEmail", JsonSerializer.Serialize(schedulerEmail));
                 await _outboxMessageRepository.AddAsync(outboxPattern);
                 await _outboxMessageRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
 

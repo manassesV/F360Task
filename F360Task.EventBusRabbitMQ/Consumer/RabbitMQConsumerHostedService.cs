@@ -6,15 +6,17 @@ public class RabbitMQConsumerHostedService : IHostedService
     private readonly ILogger<RabbitMQConsumerHostedService> _logger;
     private readonly IRetryResiliency _retryResiliency;
     private readonly IServiceScopeFactory _serviceScopeFactory;
-
+    private readonly RabbitMQConfig _rabbitMQConfig;
 
     public RabbitMQConsumerHostedService(IServiceScopeFactory serviceScopeFactory,
         ILogger<RabbitMQConsumerHostedService> logger,
-        IRetryResiliency retryResiliency)
+        IRetryResiliency retryResiliency,
+        IOptions<RabbitMQConfig> option)
     {
         _serviceScopeFactory = serviceScopeFactory;
         _logger =logger ?? throw new ArgumentException(nameof(logger));
         _retryResiliency = retryResiliency;
+        _rabbitMQConfig = option.Value;
     }
 
 
@@ -31,9 +33,9 @@ public class RabbitMQConsumerHostedService : IHostedService
             await _retryResiliency.ExecuteAsync(async () =>
             {
                 await _rabbitMqConsumer.Consumer(
-                    "Email",
-                    queueName: "CreateSchedullerEmail",
-                    consumerTag: "f360_exchange",
+                    _rabbitMQConfig.Exchange,
+                    queueName: _rabbitMQConfig.Queue,
+                    consumerTag: _rabbitMQConfig.ConsumerTag,
                     cancellationToken);
             }, cancellationToken);
 
