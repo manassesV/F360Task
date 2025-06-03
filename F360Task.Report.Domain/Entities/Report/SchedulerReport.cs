@@ -11,13 +11,13 @@ public class SchedulerReport : Scheduler, IAggregateRoot
         Type = SchedulerType.Report;
         ReportType = reportType;
         Format = format;
-        PeriodStart = PeriodStart;
-        PeriodEnd = PeriodEnd;
+        PeriodStart = periodStart;
+        PeriodEnd = periodEnd;
 
         //AddDomainEvent(new SchedullerCreatedDomainEvent(ReportType, Format, PeriodStart, PeriodEnd));
     }
-    public string ReportType { get; set; }
-    public string Format { get; set; }
-    public DateTime PeriodStart { get; set; }
-    public DateTime PeriodEnd { get; set; }
+    public string ReportType { get; private set; }
+    public string Format { get; private set; }
+    public DateTime PeriodStart { get; private set; }
+    public DateTime PeriodEnd { get; private set; }
 }

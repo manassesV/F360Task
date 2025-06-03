@@ -6,5 +6,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="xunit" Version="2.5.1" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.5.1" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+		<PackageReference Include="Moq" Version="4.20.70" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\F360Task.EventBusRabbitMQ\F360Task.EventBusRabbitMQ.csproj" />
+	</ItemGroup>
 
 </Project>

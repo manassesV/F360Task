@@ -10,7 +10,7 @@ public abstract class EntityBase
     }
 
     private List<INotification> _domainEvents;
-    public IReadOnlyCollection<INotification> DomainEvents => _domainEvents.AsReadOnly();
+    public IReadOnlyCollection<INotification> DomainEvents => _domainEvents ?? new List<INotification>();
 
     public void AddDomainEvent(INotification domainEvent)
     {
