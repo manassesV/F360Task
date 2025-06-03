@@ -13,7 +13,7 @@ Este projeto orquestra múltiplos serviços que interagem via RabbitMQ para envi
 ### Mensageria
 - **RabbitMQ**  
   - Porta AMQP: `5672`  
-  - UI de gerenciamento: `http://localhost:15672`  
+  - UI de gerenciamento: [http://localhost:15672](http://localhost:15672)  
   - Usuário/padrão: `${RABBITMQ_USER:-guest}`  
   - Senha/padrão: `${RABBITMQ_PASS:-guest}`
 
@@ -35,18 +35,24 @@ Este projeto orquestra múltiplos serviços que interagem via RabbitMQ para envi
 
 ## 📨 Recebimento de Tarefas (Jobs)
 
-As aplicações `f360taskapiemail` e `f360taskapireport` expõem endpoints de API REST que permitem o **registro de novas tarefas para processamento assíncrono**.
+As aplicações `f360taskapiemail` e `f360taskapireport` expõem endpoints de API REST que permitem o registro de novas tarefas para processamento assíncrono.
 
 ### Justificativa
 
 A arquitetura adotada separa a responsabilidade de **recebimento de requisições** da lógica de **processamento**, utilizando RabbitMQ como intermediário. Isso traz os seguintes benefícios:
 
-- ✅ **Alta escalabilidade:** múltiplos consumidores podem ser adicionados conforme a demanda.
-- ✅ **Maior resiliência:** falhas no processamento não impactam diretamente a recepção da tarefa.
-- ✅ **Desacoplamento:** facilita a manutenção, testes e substituição de componentes.
-- ✅ **Responsividade:** a API responde rapidamente sem aguardar o término do processamento.
+- ✅ Alta escalabilidade: múltiplos consumidores podem ser adicionados conforme a demanda.
+- ✅ Maior resiliência: falhas no processamento não impactam diretamente a recepção da tarefa.
+- ✅ Desacoplamento: facilita a manutenção, testes e substituição de componentes.
+- ✅ Responsividade: a API responde rapidamente sem aguardar o término do processamento.
 
-> ⚠️ Observação: O foco desta aplicação é estrutural. O processamento real (envio de e-mail ou geração de relatório) **não está implementado**; o objetivo é demonstrar como tarefas seriam enfileiradas e processadas em segundo plano.
+> ⚠️ Observação:  
+> - O foco desta aplicação é estrutural. O processamento real (envio de e-mail ou geração de relatório) **não está implementado**; o objetivo é demonstrar como tarefas seriam enfileiradas e processadas em segundo plano.  
+> - Para facilitar o desenvolvimento e testes, você pode utilizar um serviço MongoDB online (como o [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)) e configurar as conexões via variável de ambiente (`MONGO_URI_EMAIL`, `MONGO_URI_REPORT`).  
+> - **Importante:** o MongoDB local usado via Docker geralmente roda com armazenamento em `wiredTiger` padrão, mas dependendo da configuração, pode não suportar transações multi-documento; já o MongoDB Atlas oferece suporte completo a transações, o que é recomendável para cenários que precisam delas.  
+> - As APIs incluem documentação interativa via Swagger, que pode ser acessada em:  
+>   - Para API Email: `http://localhost:5000/swagger`  
+>   - Para API Report: `http://localhost:5010/swagger`  
 
 ## 🔧 Variáveis de Ambiente
 
@@ -101,12 +107,11 @@ MIT
 ✉️ Contato
 Para dúvidas ou sugestões, entre em contato: seu.email@exemplo.com
 
-yaml
+perl
 Copiar
 Editar
 
----
+Se precisar de mais alguma coisa, só avisar! Quer ajuda para incluir exemplos de endpoints no Swagger ou algo do tipo?
 
-Se precisar, posso ajudar a adaptar ou incluir mais alguma coisa! Quer que eu te ajude com algo mais?
 
 
