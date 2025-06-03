@@ -1,11 +1,10 @@
-﻿using Polly.Retry;
-
-namespace F360Task.EventBusRabbitMQ;
+﻿namespace F360Task.EventBusRabbitMQ;
 
 public class RabbitMQConnectionProvider : IRabbitMQConnectionProvider
 {
     private IConnection? _connection;
-    private IChannel _channel;
+    private IChannel _channelPublish;
+    private IChannel _channelConsumer;
     private readonly IConnectionFactory _factory;
     private readonly IRetryResiliency _retry;
     private readonly SemaphoreSlim _initLock = new(1, 1);
@@ -55,21 +54,39 @@ public class RabbitMQConnectionProvider : IRabbitMQConnectionProvider
         GC.SuppressFinalize(this);
     }
 
-    public async Task<IChannel> GetChannel()
+    public async Task<IChannel> GetChannelPublish()
     {
         if (!_initialized || _connection == null)
             throw new InvalidOperationException("Connection not initialized yet.");
 
-        if(_channel != null && !_channel.IsOpen)
+        if(_channelPublish != null && !_channelPublish.IsOpen)
         {
-            await _channel.CloseAsync();
-            _channel.Dispose();
-            _channel = await _connection.CreateChannelAsync();
+            await _channelPublish.CloseAsync();
+            _channelPublish.Dispose();
+            _channelPublish = await _connection.CreateChannelAsync();
         }
 
-        if(_channel == null) 
-            _channel = await _connection.CreateChannelAsync();
+        if(_channelPublish == null) 
+            _channelPublish = await _connection.CreateChannelAsync();
 
-        return _channel;
+        return _channelPublish;
+    }
+
+    public async Task<IChannel> GetChannelConsumer()
+    {
+        if (!_initialized || _connection == null)
+            throw new InvalidOperationException("Connection not initialized yet.");
+
+        if (_channelConsumer != null && !_channelConsumer.IsOpen)
+        {
+            await _channelConsumer.CloseAsync();
+            _channelConsumer.Dispose();
+            _channelConsumer = await _connection.CreateChannelAsync();
+        }
+
+        if (_channelConsumer == null)
+            _channelConsumer = await _connection.CreateChannelAsync();
+
+        return _channelConsumer;
     }
 }

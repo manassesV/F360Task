@@ -32,12 +32,15 @@ public class CreateSchedullerReportHandler : IRequestHandler<CreateSchedullerRep
 
             await _transactionHandler.ExecuteAsync(async (session) =>
             {
-                await _schedulerReportRepository.AddAsync(schedulerReport);
 
                 var outboxPattern = new OutboxMessage("Report", "GerarReport", JsonSerializer.Serialize(schedulerReport));
                 await _outboxMessageRepository.AddAsync(outboxPattern);
 
+                await _schedulerReportRepository.AddAsync(schedulerReport);
                 await _schedulerReportRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
+
+
+
             });
 
             return Result.Ok();
