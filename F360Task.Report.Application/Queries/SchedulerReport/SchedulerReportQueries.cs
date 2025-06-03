@@ -2,9 +2,9 @@
 
 public class SchedulerReportQueries : ISchedulerReportQueries
 {
-    private ApplicationDbContext _context;
+    private ReportDbContext _context;
 
-    public SchedulerReportQueries(ApplicationDbContext context)
+    public SchedulerReportQueries(ReportDbContext context)
     {
         _context = context;
     }

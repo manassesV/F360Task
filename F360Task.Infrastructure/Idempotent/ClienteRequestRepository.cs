@@ -4,9 +4,9 @@ namespace F360Task.Infrastructure.Infrastructure.Contexts.Idempotent;
 
 public class ClienteRequestRepository : IClienteRequestRepository
 {
-    private readonly ApplicationDbContext _context;
+    private readonly EmailDbContext _context;
 
-    public ClienteRequestRepository(ApplicationDbContext context)
+    public ClienteRequestRepository(EmailDbContext context)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }

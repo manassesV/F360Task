@@ -35,3 +35,4 @@ global using System.Text;
 global using Amazon.Runtime;
 global using F360Task.Infrastructure.Outbox;
 global using F360Task.Infrastructure.Transactions;
+global using Microsoft.Extensions.Options;

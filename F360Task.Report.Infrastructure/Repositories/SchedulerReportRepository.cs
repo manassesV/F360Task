@@ -2,9 +2,9 @@
 
 public class SchedulerReportRepository : ISchedulerReportRepository
 {
-    private readonly ApplicationDbContext _context;
+    private readonly ReportDbContext _context;
 
-    public SchedulerReportRepository(ApplicationDbContext context)
+    public SchedulerReportRepository(ReportDbContext context)
     {
         _context = context;
     }

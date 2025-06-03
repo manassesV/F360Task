@@ -2,5 +2,9 @@
 
 public interface IRabbitMqConsumer
 {
-    Task Consumer(string queueName, string consumerTag, CancellationToken cancellationToken);
+    Task Consumer(
+        string exchange,
+        string queueName,
+        string consumerTag,
+        CancellationToken cancellationToken);
 }

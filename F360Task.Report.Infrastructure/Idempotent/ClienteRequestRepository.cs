@@ -2,9 +2,9 @@
 
 public class ClienteRequestRepository : IClienteRequestRepository
 {
-    private readonly ApplicationDbContext _context;
+    private readonly ReportDbContext _context;
 
-    public ClienteRequestRepository(ApplicationDbContext context)
+    public ClienteRequestRepository(ReportDbContext context)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }

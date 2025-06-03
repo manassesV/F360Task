@@ -2,11 +2,11 @@
 
 public class InboxMessageRepository : IInboxMessageRepository
 {
-    private readonly ApplicationDbContext _context;
+    private readonly EmailDbContext _context;
     public IUnitOfWork UnitOfWork => _context;
 
 
-    public InboxMessageRepository(ApplicationDbContext context)
+    public InboxMessageRepository(EmailDbContext context)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }
@@ -29,7 +29,6 @@ public class InboxMessageRepository : IInboxMessageRepository
     public Task<List<InboxMessage>> FindAllAsync(bool processed, CancellationToken cancellationToken)
     {
         return _context.InboxMessage
-            .AsNoTracking()
             .Where(p => p.Processed == processed)
             .OrderBy(c => c.ProcessedAt)
             .ToListAsync(cancellationToken);

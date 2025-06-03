@@ -25,16 +25,11 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseSwagger();
-app.UseSwaggerUI(options =>
+app.UseSwaggerUI(c =>
 {
-    using var scope = app.Services.CreateScope();
-    var versionProvider = scope.ServiceProvider.GetRequiredService<IApiVersionDescriptionProvider>();
-
-    foreach (var description in versionProvider.ApiVersionDescriptions)
-    {
-        options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
-    }
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
 });
+
 
 app.UseAuthorization();
 

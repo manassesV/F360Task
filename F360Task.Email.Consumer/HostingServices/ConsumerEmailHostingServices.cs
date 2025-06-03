@@ -33,7 +33,11 @@ public class ConsumerEmailHostingServices : IHostedService, IDisposable
                     continue;
                 }
 
-                foreach (var message in inboxMessages)
+                await Parallel.ForEachAsync(inboxMessages, new ParallelOptions
+                {
+                    CancellationToken = cancellationToken,
+                    MaxDegreeOfParallelism = Environment.ProcessorCount
+                }, async (message, ct) =>
                 {
                     await _transactionHandler.ExecuteAsync(async (data) =>
                      {
@@ -43,7 +47,7 @@ public class ConsumerEmailHostingServices : IHostedService, IDisposable
                      });
 
 
-                }
+                });
 
                 _logger.LogInformation("🟢 {Count} mensagens processadas em {Time}", inboxMessages.Count(), DateTimeOffset.Now);
 

@@ -1,4 +1,7 @@
-﻿namespace F360Task.EventBusRabbitMQ.Consumer;
+﻿
+using RabbitMQ.Client;
+
+namespace F360Task.EventBusRabbitMQ.Consumer;
 
 public class RabbitMqConsumer : IRabbitMqConsumer
 {
@@ -15,21 +18,24 @@ public class RabbitMqConsumer : IRabbitMqConsumer
     }
 
     public async Task Consumer(
+        string exchange,
         string queueName,
         string consumerTag,
         CancellationToken cancellationToken)
     {
 
 
-        var connection = _rabbitMQConnectionProvider.GetConnection();
-
-        var channel = await connection.CreateChannelAsync();
-        _rabbitAsyncConsumer.SetChannel(channel); // ← canal correto sendo passado
-
+      
         try
         {
+            var connection = _rabbitMQConnectionProvider.GetConnection();
 
-             await channel.BasicConsumeAsync(
+            var channel = await connection.CreateChannelAsync();
+            _rabbitAsyncConsumer.SetChannel(channel); // ← canal correto sendo passado
+
+            await EnsureQueueBoundAsync(exchange, queueName, channel);
+
+            await channel.BasicConsumeAsync(
                     queue: queueName,
                     autoAck: false,
                     consumerTag: consumerTag,
@@ -47,5 +53,30 @@ public class RabbitMqConsumer : IRabbitMqConsumer
 
         }
 
+    }
+
+    private async Task EnsureQueueBoundAsync(string exchange,
+        string queueName,
+        IChannel channel,
+        string exchangeType = ExchangeType.Direct,
+        bool durable = true)
+    {
+        await channel.ExchangeDeclareAsync(
+           exchange: exchange,
+           type: exchangeType,
+           durable: durable);
+
+        await channel.QueueDeclareAsync(
+             queue: queueName,
+             durable: true,
+             exclusive: false,
+             autoDelete: false,
+             arguments: null);
+
+        await channel.QueueBindAsync(
+             queue: queueName,
+             exchange: exchange,
+             routingKey: "",
+             arguments: null);
     }
 }

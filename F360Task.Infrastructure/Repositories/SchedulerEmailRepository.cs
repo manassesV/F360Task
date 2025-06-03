@@ -2,9 +2,9 @@
 
 public class SchedulerEmailRepository : ISchedulerEmailRepository
 {
-    private readonly ApplicationDbContext _context;
+    private readonly EmailDbContext _context;
 
-    public SchedulerEmailRepository(ApplicationDbContext context)
+    public SchedulerEmailRepository(EmailDbContext context)
     {
         _context = context;
     }

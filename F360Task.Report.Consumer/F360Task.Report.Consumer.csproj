@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
@@ -13,7 +14,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\F360Task.Infrastructure\F360Task.Infrastructure.csproj" />
+	  <ProjectReference Include="..\F360Task.Report.Infrastructure\F360Task.Report.Infrastructure.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="appsettings.json">

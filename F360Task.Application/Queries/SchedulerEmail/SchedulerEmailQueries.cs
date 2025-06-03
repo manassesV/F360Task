@@ -2,9 +2,9 @@
 
 public class SchedulerEmailQueries : ISchedulerEmailQueries
 {
-    private ApplicationDbContext _context;
+    private EmailDbContext _context;
 
-    public SchedulerEmailQueries(ApplicationDbContext context)
+    public SchedulerEmailQueries(EmailDbContext context)
     {
         _context = context;
     }

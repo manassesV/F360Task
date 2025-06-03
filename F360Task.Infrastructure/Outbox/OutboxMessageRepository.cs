@@ -2,10 +2,10 @@
 
 public class OutboxMessageRepository : IOutboxMessageRepository
 {
-    private readonly ApplicationDbContext _context;
+    private readonly EmailDbContext _context;
     public IUnitOfWork UnitOfWork => _context;
 
-    public OutboxMessageRepository(ApplicationDbContext context)
+    public OutboxMessageRepository(EmailDbContext context)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }
@@ -28,7 +28,6 @@ public class OutboxMessageRepository : IOutboxMessageRepository
         CancellationToken cancellationToken)
     {
         return await _context.OutboxMessage
-            .AsNoTracking()
             .Where(p => p.Processed == processed)
             .OrderBy(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
@@ -37,5 +36,6 @@ public class OutboxMessageRepository : IOutboxMessageRepository
     public async Task UpdateAsync(OutboxMessage outboxMessage)
     {
         _context.OutboxMessage.Update(outboxMessage);
+
     }
 }

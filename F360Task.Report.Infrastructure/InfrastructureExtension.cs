@@ -32,7 +32,7 @@ public static class InfrastructureExtension
             return new MongoDbConnection(client, url);
         });
 
-        services.AddScoped<ApplicationDbContext>();
+        services.AddScoped<ReportDbContext>();
         services.AddScoped<ITransactionHandler<IClientSessionHandle>, TransactionHandler>();
 
 

@@ -45,10 +45,6 @@ public abstract class IdentifiedCommandHandler<T, R> :
                     idProperty = nameof(request.Id);
                     commandId = nameof(request.Id);
                     break;
-                case CreateSchedullerReportCommand createSchedullerReportCommand:
-                    idProperty = nameof(request.Id);
-                    commandId = nameof(request.Id);
-                    break;
                 default:
                     idProperty = "Id?";
                     commandId = "n/a";

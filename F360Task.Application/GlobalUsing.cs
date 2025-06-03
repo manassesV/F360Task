@@ -40,10 +40,8 @@ global using F360Task.Application.Commands;     // Comandos da aplicação (ex: 
 // ─────────────────────────────
 global using F360Task.Domain.Seed;               // Objetos base, interfaces e abstrações do domínio
 global using F360Task.Domain.Entities.Email;     // Entidades relacionadas a e-mails
-global using F360Task.Domain.Entities.Report;    // Entidades de relatórios
 global using F360Task.Domain.AggregatesModel;    // Agregados do domínio e interfaces de repositórios
 global using F360Task.Application.Queries.SchedulerEmail;
-global using F360Task.Application.Queries.SchedulerReport;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Hosting;
 global using F360Task.Application.Validations;
