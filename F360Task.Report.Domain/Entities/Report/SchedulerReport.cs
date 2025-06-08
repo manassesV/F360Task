@@ -20,4 +20,8 @@ public class SchedulerReport : Scheduler, IAggregateRoot
     public string Format { get; private set; }
     public DateTime PeriodStart { get; private set; }
     public DateTime PeriodEnd { get; private set; }
+    public DateTime? LockedUntil { get; private set; }
+    public DateTime? ProcessedDate { get; private set; }
+
+    
 }
