@@ -15,5 +15,9 @@ public class SchedulerEmail : Scheduler, IAggregateRoot
     public string To { get; set; }
     public string Subject { get; set; }
     public string Body { get; set; }
+    
+    public DateTime? LockedUntil { get; private set; }
+    public DateTime? ProcessedDate { get; private set; }
+
 
 }
