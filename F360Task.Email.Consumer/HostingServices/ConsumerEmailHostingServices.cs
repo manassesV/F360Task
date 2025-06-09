@@ -4,7 +4,6 @@ public class ConsumerEmailHostingServices : IHostedService, IDisposable
 {
     private readonly IInboxMessageRepository _inboxRepository;
     private readonly ILogger<ConsumerEmailHostingServices> _logger;
-    private readonly ITransactionHandler<IClientSessionHandle> _transactionHandler;
 
     public ConsumerEmailHostingServices(IInboxMessageRepository inboxRepository,
         ILogger<ConsumerEmailHostingServices> logger,
@@ -12,7 +11,6 @@ public class ConsumerEmailHostingServices : IHostedService, IDisposable
     {
         _inboxRepository = inboxRepository;
         _logger = logger;
-        _transactionHandler = transactionHandler;
     }
 
     public void Dispose() => _inboxRepository.UnitOfWork.Dispose();
@@ -26,7 +24,13 @@ public class ConsumerEmailHostingServices : IHostedService, IDisposable
         {
             while (await timer.WaitForNextTickAsync(cancellationToken))
             {
-                var inboxMessages = await _inboxRepository.FindAllAsync(false, cancellationToken);
+                var now = DateTime.UtcNow;
+                var lockDuration = TimeSpan.FromSeconds(30);
+
+                var inboxMessages = await _inboxRepository.FindAllAsync(false, 
+                    now,
+                    lockDuration,
+                    cancellationToken);
 
                 if (inboxMessages is null || !inboxMessages.Any())
                 {
@@ -39,13 +43,9 @@ public class ConsumerEmailHostingServices : IHostedService, IDisposable
                     MaxDegreeOfParallelism = Environment.ProcessorCount
                 }, async (message, ct) =>
                 {
-                    await _transactionHandler.ExecuteAsync(async (data) =>
-                     {
+                   
                          message.ChangeToProcessed();
-                         await _inboxRepository.UpdateAsync(message);
-                         await _inboxRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
-                     });
-
+                         await _inboxRepository.UpdateAsync(message);                     
 
                 });
 

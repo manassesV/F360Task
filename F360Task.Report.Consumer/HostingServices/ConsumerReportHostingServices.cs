@@ -26,7 +26,13 @@ public class ConsumerReportHostingServices : IHostedService, IDisposable
         {
             while (await timer.WaitForNextTickAsync(cancellationToken))
             {
-                var inboxMessages = await _inboxRepository.FindAllAsync(false, cancellationToken);
+                var now = DateTime.UtcNow;
+                var lockDuration = TimeSpan.FromSeconds(30);
+
+                var inboxMessages = await _inboxRepository.FindAllAsync(false,
+                    now,
+                    lockDuration,
+                    cancellationToken);
 
                 if (inboxMessages is null || !inboxMessages.Any())
                 {

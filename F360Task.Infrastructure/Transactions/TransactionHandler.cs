@@ -20,6 +20,8 @@ public class TransactionHandler : ITransactionHandler<IClientSessionHandle>
         {
             await action(session);
 
+           
+           
             // Add debug logging before commit
             _logger.LogDebug("Committing transaction for session {SessionId}", session.ServerSession.Id);
 

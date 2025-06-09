@@ -19,6 +19,7 @@ public class OutboxMessage
     public string Payload { get; private set; }
     public bool Processed { get; private set; }
     public DateTime? ProcessedAt { get; private set; }
+    public DateTime? LockedUntil { get; private set; }
     public int Retry { get; private set; }
 
     public void ChangeToProcessed()
@@ -31,6 +32,11 @@ public class OutboxMessage
     {
         Processed = false;
         ProcessedAt = null;
+    }
+
+    public void ChangeToLocked(DateTime now, TimeSpan lockDuration)
+    {
+        LockedUntil = now.Add(lockDuration);
     }
 
     public void IncrementRetryCount()

@@ -13,10 +13,16 @@ public class InboxMessage
     public bool Processed { get; private set; }
     public DateTime ReceivedAt { get; private set; }
     public DateTime? ProcessedAt { get; private set; }
+    public DateTime? LockedUntil { get; private set; }
 
     public void ChangeToProcessed()
     {
         Processed = true;
         ProcessedAt = DateTime.Now;
+    }
+
+    public void ChangeToLocked(DateTime now, TimeSpan lockDuration)
+    {
+        LockedUntil = now.Add(lockDuration);
     }
 }
