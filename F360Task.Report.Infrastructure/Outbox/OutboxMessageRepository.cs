@@ -4,15 +4,21 @@ public class OutboxMessageRepository : IOutboxMessageRepository
 {
     private readonly ReportDbContext _context;
     public IUnitOfWork UnitOfWork => _context;
+    private ITransactionHandler<IClientSessionHandle> _transactionHandler;
 
-    public OutboxMessageRepository(ReportDbContext context)
+    public OutboxMessageRepository(ReportDbContext context, ITransactionHandler<IClientSessionHandle> transactionHandler)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
+        _transactionHandler = transactionHandler ?? throw new ArgumentNullException(nameof(transactionHandler));
     }
 
-    public async Task AddAsync(OutboxMessage outboxMessage)
+    public async Task AddAsync(OutboxMessage outboxMessage, CancellationToken cancellationToken)
     {
-        _context.OutboxMessage.Add(outboxMessage);
+       await  _transactionHandler.ExecuteAsync(async (session) =>
+        {
+            _context.OutboxMessage.Add(outboxMessage);
+           await _context.SaveChangesAsync(cancellationToken);
+        });
     }
 
     public Task<bool> ExistAsync(Guid id, CancellationToken cancellationToken)
@@ -25,17 +31,42 @@ public class OutboxMessageRepository : IOutboxMessageRepository
     }
 
     public async Task<List<OutboxMessage>> FindAllAsync(bool processed,
+        DateTime now,
+        TimeSpan lockDuration,
         CancellationToken cancellationToken)
     {
-        return await _context.OutboxMessage
-            .AsNoTracking()
-            .Where(p => p.Processed == processed)
-            .OrderBy(x => x.CreatedAt)
+        List<OutboxMessage> lockedMessage = new();
+
+
+        await _transactionHandler.ExecuteAsync(async (session) =>
+        {
+
+            lockedMessage = await _context.OutboxMessage
+            .AsQueryable()
+            .Where(p => p.Processed == processed &&
+            (!p.LockedUntil.HasValue || p.LockedUntil < now))
+            .OrderBy(c => c.ProcessedAt)
             .ToListAsync(cancellationToken);
+
+            foreach (var inboxMessage in lockedMessage)
+            {
+                inboxMessage.ChangeToLocked(now, lockDuration);
+            }
+
+            _context.OutboxMessage.UpdateRange(lockedMessage);
+            await _context.SaveChangesAsync(cancellationToken);
+
+        });
+
+        return lockedMessage;
     }
 
     public async Task UpdateAsync(OutboxMessage outboxMessage)
     {
-        _context.OutboxMessage.Update(outboxMessage);
+        await _transactionHandler.ExecuteAsync(async (session) =>
+        {
+            _context.OutboxMessage.Update(outboxMessage);
+            await _context.SaveChangesAsync();
+        });
     }
 }

@@ -4,8 +4,10 @@ public interface IOutboxMessageRepository
 {
     IUnitOfWork UnitOfWork { get; }
 
-    Task AddAsync(OutboxMessage outboxMessage);
+    Task AddAsync(OutboxMessage outboxMessage, CancellationToken cancellationToken);
     Task UpdateAsync(OutboxMessage outboxMessage);
     Task<List<OutboxMessage>> FindAllAsync(bool processed,
-        CancellationToken cancellationToken);
+         DateTime now,
+         TimeSpan lockDuration,
+         CancellationToken cancellationToken);
 }

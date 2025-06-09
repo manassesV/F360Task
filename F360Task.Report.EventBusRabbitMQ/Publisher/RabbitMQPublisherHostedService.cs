@@ -60,7 +60,13 @@ public class RabbitMQPublisherHostedService : BackgroundService
         ITransactionHandler<IClientSessionHandle> transactionHandler,
         CancellationToken cancellationToken)
     {
-        var messages = await repository.FindAllAsync(processed: false, cancellationToken);
+        var now = DateTime.UtcNow;
+        var lockDuration = TimeSpan.FromSeconds(30);
+
+        var messages = await repository.FindAllAsync(processed: false,
+            now,
+            lockDuration,
+            cancellationToken);
 
         if (messages == null || !messages.Any())
         {
@@ -140,7 +146,6 @@ public class RabbitMQPublisherHostedService : BackgroundService
         {
             message.ChangeToProcessed();
             await repository.UpdateAsync(message);
-            await repository.UnitOfWork.SaveChangesAsync(cancellationToken);
         });
     }
 
@@ -155,7 +160,6 @@ public class RabbitMQPublisherHostedService : BackgroundService
         {
             message.ChangeToFailed();
             await repository.UpdateAsync(message);
-            await repository.UnitOfWork.SaveChangesAsync(cancellationToken);
         });
     }
 
